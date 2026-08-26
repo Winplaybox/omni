@@ -5,6 +5,15 @@ package-lock.json
 # Environment variables (contains private Redis URL and passwords)
 .env
 
+# Build/Archive outputs
+*.zip
+*.tgz
+*.tar.gz
+
+# Helper scripts
+commit.cjs
+commit.js
+
 # OS files
 .DS_Store
 Thumbs.db
