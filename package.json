@@ -1,0 +1,13 @@
+{
+  "name": "omniroute-hostinger",
+  "version": "1.0.0",
+  "description": "OmniRoute AI Gateway wrapper for Hostinger Deployment",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "omniroute": "^3.8.48"
+  }
+}
