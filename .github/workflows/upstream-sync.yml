@@ -1,14 +1,9 @@
-name: Upstream Sync Check (OmniRoute)
-
-# Checks the original diegosouzapw/OmniRoute repo weekly for new commits.
-# Does NOT auto-merge (safer for a rebranded fork) — it opens a Pull Request
-# for you to review and merge manually, so your WinPlayBox branding/config
-# is never silently overwritten.
+name: Upstream Sync (Auto-merge)
 
 on:
   schedule:
     - cron: "0 6 * * 1"   # every Monday 6:00 UTC (~11:30 AM IST)
-  workflow_dispatch:        # lets you trigger it manually anytime from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -18,45 +13,57 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your fork
+      - name: Checkout your repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set date variable
+        id: vars
+        run: echo "date=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
       - name: Add upstream remote
         run: |
           git remote add upstream https://github.com/diegosouzapw/OmniRoute.git || true
           git fetch upstream
 
-      - name: Check if upstream has new commits
-        id: check
-        run: |
-          BEHIND=$(git rev-list --count HEAD..upstream/main)
-          echo "behind=$BEHIND" >> "$GITHUB_OUTPUT"
-          echo "Upstream is $BEHIND commit(s) ahead."
-
-      - name: Create sync branch and merge upstream
-        if: steps.check.outputs.behind != '0'
+      - name: Configure git identity
         run: |
           git config user.name "winplaybox-bot"
           git config user.email "bot@winplaybox.in"
-          BRANCH="upstream-sync-$(date +%Y-%m-%d)"
+
+      - name: Merge upstream into main
+        id: merge
+        run: |
+          git checkout main
+          if git merge upstream/main --no-edit; then
+            echo "status=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=conflict" >> "$GITHUB_OUTPUT"
+            git merge --abort
+          fi
+
+      - name: Push merged changes
+        if: steps.merge.outputs.status == 'success'
+        run: git push origin main
+
+      - name: Create conflict branch
+        if: steps.merge.outputs.status == 'conflict'
+        run: |
+          BRANCH="upstream-sync-conflict-${{ steps.vars.outputs.date }}"
           git checkout -b "$BRANCH"
           git merge upstream/main --no-edit || true
           git push origin "$BRANCH" -f
 
-      - name: Open Pull Request
-        if: steps.check.outputs.behind != '0'
+      - name: Open PR if conflict occurred
+        if: steps.merge.outputs.status == 'conflict'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: "upstream-sync-$(date +%Y-%m-%d)"
-          title: "🔄 Upstream sync: ${{ steps.check.outputs.behind }} new commit(s) from OmniRoute"
+          branch: "upstream-sync-conflict-${{ steps.vars.outputs.date }}"
+          title: "⚠️ Upstream sync conflict — manual review needed"
           body: |
-            Automated weekly check against [diegosouzapw/OmniRoute](https://github.com/diegosouzapw/OmniRoute).
-
-            This PR pulls in upstream updates (new providers, bug fixes, features).
-            Review before merging — if there are conflicts in branding/config files,
-            resolve them keeping your WinPlayBox settings.
-          labels: upstream-sync
+            Auto-merge failed due to a conflict with upstream OmniRoute changes.
+            Please resolve manually, keeping WinPlayBox branding/config intact.
+          labels: upstream-sync, conflict
