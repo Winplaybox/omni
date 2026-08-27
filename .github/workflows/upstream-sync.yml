@@ -54,13 +54,19 @@ jobs:
           BRANCH="upstream-sync-conflict-${{ steps.vars.outputs.date }}"
           git checkout -b "$BRANCH"
           git merge upstream/main --no-edit --allow-unrelated-histories || true
+          git add -A
+          git commit -m "Merge upstream (with conflicts) for manual resolution" || true
           git push origin "$BRANCH" -f
+          # IMPORTANT: go back to main so the next step doesn't treat
+          # the conflict branch itself as the PR base
+          git checkout main
 
       - name: Open PR if conflict occurred
         if: steps.merge.outputs.status == 'conflict'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
           branch: "upstream-sync-conflict-${{ steps.vars.outputs.date }}"
           title: "⚠️ Upstream sync conflict — manual review needed"
           body: |
