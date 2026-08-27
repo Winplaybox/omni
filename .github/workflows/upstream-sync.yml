@@ -37,7 +37,7 @@ jobs:
         id: merge
         run: |
           git checkout main
-          if git merge upstream/main --no-edit; then
+          if git merge upstream/main --no-edit --allow-unrelated-histories; then
             echo "status=success" >> "$GITHUB_OUTPUT"
           else
             echo "status=conflict" >> "$GITHUB_OUTPUT"
@@ -53,7 +53,7 @@ jobs:
         run: |
           BRANCH="upstream-sync-conflict-${{ steps.vars.outputs.date }}"
           git checkout -b "$BRANCH"
-          git merge upstream/main --no-edit || true
+          git merge upstream/main --no-edit --allow-unrelated-histories || true
           git push origin "$BRANCH" -f
 
       - name: Open PR if conflict occurred
