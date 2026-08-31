@@ -64,7 +64,7 @@ jobs:
 
       - name: Open PR if conflict occurred
         if: steps.merge.outputs.status == 'conflict'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           base: main
