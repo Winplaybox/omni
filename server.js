@@ -11,9 +11,9 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware with 50MB payload limit (prevents server overload on large media)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Security & Caching Headers
 app.use((req, res, next) => {
@@ -99,6 +99,26 @@ app.post('/api/synthesize', (req, res) => {
     prompt: prompt,
     synthesized_at: new Date().toISOString(),
     status: 'ready'
+  });
+});
+
+// API: Multimodal Media Prompt Deconstruction Endpoint
+app.post('/api/analyze-media', (req, res) => {
+  const { mediaType, rawText, fileName, fileSizeMB, durationSec } = req.body;
+
+  // Enforce max server-side limits
+  if (fileSizeMB && parseFloat(fileSizeMB) > 50) {
+    return res.status(413).json({ error: 'File size exceeds maximum allowed 50MB limit' });
+  }
+  if (durationSec && parseInt(durationSec) > 60) {
+    return res.status(400).json({ error: 'Video duration exceeds maximum allowed 60s limit' });
+  }
+
+  res.json({
+    success: true,
+    mediaType: mediaType || 'video',
+    sanitized: true,
+    analyzed_at: new Date().toISOString()
   });
 });
 

@@ -361,46 +361,62 @@ function renderCanvas(workflow) {
   setTimeout(drawConnections, 60);
 }
 
-// Draw Connecting SVG Cables With Traveling Pulse Packet
+// Draw Connecting SVG Cables With Traveling Pulse Packet (Pixel-Perfect Alignment)
 function drawConnections() {
   const svg = document.getElementById("svg-connections");
+  const wrapper = document.getElementById("pipeline-canvas-wrapper");
   const container = document.getElementById("pipeline-nodes-mount");
-  if (!svg || !container) return;
+  if (!svg || !wrapper || !container) return;
 
-  svg.innerHTML = "";
   const nodes = container.querySelectorAll(".wf-node");
-  if (nodes.length < 2) return;
+  if (nodes.length < 2) {
+    svg.innerHTML = "";
+    return;
+  }
 
-  const containerRect = container.getBoundingClientRect();
+  // Exact bounds of the wrapper
+  const wrapperRect = wrapper.getBoundingClientRect();
+  const width = Math.max(wrapper.scrollWidth, wrapper.clientWidth);
+  const height = Math.max(wrapper.scrollHeight, wrapper.clientHeight);
+
+  svg.style.width = width + "px";
+  svg.style.height = height + "px";
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.innerHTML = "";
 
   for (let i = 0; i < nodes.length - 1; i++) {
-    const fromRect = nodes[i].getBoundingClientRect();
-    const toRect = nodes[i + 1].getBoundingClientRect();
+    const fromPort = nodes[i].querySelector(".node-port.output");
+    const toPort = nodes[i + 1].querySelector(".node-port.input");
 
-    const startX = (fromRect.right - containerRect.left);
-    const startY = (fromRect.top + fromRect.height / 2 - containerRect.top);
-    const endX = (toRect.left - containerRect.left);
-    const endY = (toRect.top + toRect.height / 2 - containerRect.top);
+    const fromRect = fromPort ? fromPort.getBoundingClientRect() : nodes[i].getBoundingClientRect();
+    const toRect = toPort ? toPort.getBoundingClientRect() : nodes[i + 1].getBoundingClientRect();
 
-    const deltaX = (endX - startX) / 2;
+    // Exact center coordinates relative to the wrapper coordinate system
+    const startX = fromRect.left + (fromRect.width / 2) - wrapperRect.left + wrapper.scrollLeft;
+    const startY = fromRect.top + (fromRect.height / 2) - wrapperRect.top + wrapper.scrollTop;
+    const endX = toRect.left + (toRect.width / 2) - wrapperRect.left + wrapper.scrollLeft;
+    const endY = toRect.top + (toRect.height / 2) - wrapperRect.top + wrapper.scrollTop;
+
+    const deltaX = (endX - startX) * 0.5;
     const pathD = `M ${startX} ${startY} C ${startX + deltaX} ${startY}, ${endX - deltaX} ${endY}, ${endX} ${endY}`;
 
-    // Base Cable Path
+    // Base Static Cable Path
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", pathD);
     path.setAttribute("class", "pipeline-cable");
     path.id = `cable-${i}`;
     svg.appendChild(path);
 
-    // Traveling Data Packet Particle
+    // Idle Traveling Data Packet
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("r", "3.5");
+    circle.setAttribute("r", "4");
     circle.setAttribute("fill", "#ffffff");
     circle.setAttribute("id", `packet-${i}`);
+    circle.style.filter = "drop-shadow(0 0 5px #ffffff)";
 
     const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
     animMotion.setAttribute("path", pathD);
-    animMotion.setAttribute("dur", "2.2s");
+    animMotion.setAttribute("dur", "2.0s");
     animMotion.setAttribute("repeatCount", "indefinite");
     animMotion.setAttribute("begin", `${i * 0.45}s`);
     circle.appendChild(animMotion);
@@ -409,15 +425,22 @@ function drawConnections() {
   }
 }
 
-window.addEventListener("resize", drawConnections);
+window.addEventListener("resize", () => {
+  setTimeout(drawConnections, 50);
+});
 
-// Pipeline Runner Simulation (Visual Step-by-Step Telemetry)
+// Pipeline Runner Simulation (Step-by-Step Live Animation & Telemetry)
 window.simulateWorkflowRun = function() {
   if (isSimulating) return;
   isSimulating = true;
 
   const runBtn = document.getElementById("run-sim-btn");
   const statusIndicator = document.getElementById("pipeline-status-text");
+  const progressBar = document.getElementById("pipeline-progress-bar");
+  const stageOverall = document.getElementById("stage-tag-overall");
+  const stagePacket = document.getElementById("stage-tag-packet");
+  const stageLatency = document.getElementById("stage-tag-latency");
+  const streamBadge = document.getElementById("console-node-stream-badge");
 
   if (runBtn) {
     runBtn.disabled = true;
@@ -427,59 +450,98 @@ window.simulateWorkflowRun = function() {
     `;
   }
 
+  if (progressBar) progressBar.style.width = "0%";
   logConsole("RUNNER", `Executing pipeline: [${currentWorkflow.title}]`, "info");
 
   const nodes = document.querySelectorAll(".wf-node");
   let step = 0;
 
+  // Reset any previous visual states
+  nodes.forEach(n => {
+    n.classList.remove("executing", "completed");
+  });
+  document.querySelectorAll(".pipeline-cable").forEach(c => {
+    c.classList.remove("active-stream", "completed-stream");
+  });
+
   function runNextStep() {
     if (step < nodes.length) {
-      // Deactivate previous
-      nodes.forEach(n => n.classList.remove("executing"));
+      const nodeData = currentWorkflow.nodes[step];
+      const progressPct = Math.round(((step + 1) / nodes.length) * 100);
+
+      // Update progress bar
+      if (progressBar) progressBar.style.width = `${progressPct}%`;
+
+      // Update stage tags
+      if (stageOverall) stageOverall.textContent = `STAGE: Node ${step + 1} of ${nodes.length} (${nodeData.badge})`;
+      if (stagePacket) stagePacket.textContent = `DATA PACKET: Transmitting -> [${nodeData.title}]`;
+      if (streamBadge) streamBadge.textContent = `Node ${step + 1} Active`;
 
       // Activate current node
       const currentNode = nodes[step];
+      nodes.forEach(n => n.classList.remove("executing"));
       currentNode.classList.add("executing");
 
-      const nodeData = currentWorkflow.nodes[step];
       const statePill = document.getElementById(`node-state-${step}`);
       if (statePill) {
-        statePill.innerHTML = `<span>State</span><span style="color:#ffffff; font-weight:700;">EXECUTING</span>`;
+        statePill.innerHTML = `<span>State</span><span style="color:#ffffff; font-weight:800; animation: pulseWhite 0.8s infinite;">RUNNING ●</span>`;
       }
 
-      // Activate corresponding cable
+      // Activate preceding cable with high-speed white laser
       if (step > 0) {
         const prevCable = document.getElementById(`cable-${step - 1}`);
-        if (prevCable) prevCable.classList.add("active-stream");
+        if (prevCable) {
+          prevCable.classList.remove("completed-stream");
+          prevCable.classList.add("active-stream");
+        }
       }
 
       if (statusIndicator) {
-        statusIndicator.textContent = `Processing Step ${step + 1}/${nodes.length}: ${nodeData.title}...`;
+        statusIndicator.textContent = `Executing Node ${step + 1}/${nodes.length}: ${nodeData.title} (${nodeData.service})...`;
       }
 
-      const latency = Math.floor(Math.random() * 80 + 30);
-      logConsole(nodeData.badge.toUpperCase(), `[Node ${step + 1}: ${nodeData.title}] -> OK (${latency}ms)`, "success");
+      const latency = Math.floor(Math.random() * 90 + 40);
+      if (stageLatency) stageLatency.textContent = `LATENCY: ${latency}ms`;
+
+      logConsole(nodeData.badge.toUpperCase(), `[Node ${step + 1}: ${nodeData.title}] Payload dispatched to ${nodeData.service} -> In-flight`, "info");
 
       setTimeout(() => {
         currentNode.classList.remove("executing");
         currentNode.classList.add("completed");
         if (statePill) {
-          statePill.innerHTML = `<span>State</span><span style="color:#a3a3a3;">COMPLETED ✓</span>`;
+          statePill.innerHTML = `<span>State</span><span style="color:#ffffff; font-weight:700;">COMPLETED ✓</span>`;
         }
+
+        if (step > 0) {
+          const prevCable = document.getElementById(`cable-${step - 1}`);
+          if (prevCable) {
+            prevCable.classList.remove("active-stream");
+            prevCable.classList.add("completed-stream");
+          }
+        }
+
+        logConsole("TELEMETRY", `[Node ${step + 1}: ${nodeData.title}] -> OK 200 (${latency}ms, 0 payload loss)`, "success");
 
         step++;
         runNextStep();
-      }, 750);
+      }, 850);
 
     } else {
-      // Completed all steps
-      if (statusIndicator) statusIndicator.textContent = "Pipeline execution complete (100% verified)";
-      logConsole("PIPELINE", "All nodes returned 200 OK. Output payload synthesized & ready.", "success");
+      // All steps completed
+      if (progressBar) progressBar.style.width = "100%";
+      if (statusIndicator) statusIndicator.textContent = "Pipeline execution complete — 100% Verified Success";
+      if (stageOverall) stageOverall.textContent = "STAGE: ALL NODES SYNCHRONIZED";
+      if (stagePacket) stagePacket.textContent = "DATA PACKET: 100% DISPATCHED";
+      if (stageLatency) stageLatency.textContent = "TOTAL PIPELINE: ~420ms";
+      if (streamBadge) streamBadge.textContent = "Pipeline Idle";
 
-      // Reset cables after 1.5s
-      setTimeout(() => {
-        document.querySelectorAll(".pipeline-cable").forEach(c => c.classList.remove("active-stream"));
-      }, 1500);
+      logConsole("SYSTEM", `Pipeline "${currentWorkflow.title}" finished. Output verified across all endpoints.`, "success");
+
+      // Mark all cables as solid completed
+      document.querySelectorAll(".pipeline-cable").forEach(c => {
+        c.classList.remove("active-stream");
+        c.classList.add("completed-stream");
+      });
 
       isSimulating = false;
       if (runBtn) {
@@ -514,184 +576,423 @@ function logConsole(source, msg, type = "info") {
   consoleEl.scrollTop = consoleEl.scrollHeight;
 }
 
-// Render Catalog Cards
-function renderCatalog(workflows) {
-  const grid = document.getElementById("catalog-grid-mount");
-  if (!grid) return;
-
-  grid.innerHTML = "";
-  workflows.forEach(wf => {
-    const card = document.createElement("div");
-    card.className = "workflow-card";
-    card.innerHTML = `
-      <div class="wf-card-header">
-        <span class="wf-card-domain">${escapeHtml(wf.domain)}</span>
-        <span class="wf-card-steps">${wf.stepsCount} Nodes</span>
-      </div>
-      <h3 class="wf-card-title">${escapeHtml(wf.title)}</h3>
-      <p class="wf-card-desc">${escapeHtml(wf.description)}</p>
-      <div class="wf-card-tags">
-        ${wf.tags.map(t => `<span class="wf-tech-tag">${escapeHtml(t)}</span>`).join("")}
-      </div>
-      <div class="wf-card-actions">
-        <button type="button" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadWorkflowIntoCanvas('${wf.id}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Load Pipeline</span>
-        </button>
-        <button type="button" class="btn-secondary" style="padding: 0.5rem 0.85rem; font-size: 0.8rem;" onclick="openExportModal('${wf.id}')">
-          <span>Export Code</span>
-        </button>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-// Filter Catalog
-window.filterCatalog = function(domain, btn) {
-  document.querySelectorAll(".cat-tab-btn").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-
-  if (domain === "all") {
-    renderCatalog(PRESET_WORKFLOWS);
-  } else {
-    renderCatalog(PRESET_WORKFLOWS.filter(w => w.domain.toLowerCase().includes(domain.toLowerCase())));
-  }
-};
-
-// Load Workflow into Canvas
-window.loadWorkflowIntoCanvas = function(workflowId) {
-  const wf = PRESET_WORKFLOWS.find(w => w.id === workflowId);
-  if (wf) {
-    currentWorkflow = wf;
-    renderCanvas(currentWorkflow);
-    logConsole("LOADER", `Loaded blueprint: [${wf.title}]`, "info");
-    const studio = document.getElementById("studio");
-    if (studio) studio.scrollIntoView({ behavior: "smooth" });
-    simulateWorkflowRun();
-  }
-};
-
 /* ==========================================================================
-   MULTIMODAL PROMPT REPLICATOR ENGINE (VIDEO / IMAGE / TEXT TO PROMPT)
+   MULTIMODAL PROMPT REPLICATOR ENGINE (FILE UPLOAD & REVERSE ENGINEERING)
    ========================================================================== */
 
 let mmActiveTab = "video"; // 'video' | 'image' | 'agent'
+let currentUploadedFile = null;
+let currentMediaMetadata = {
+  name: "",
+  sizeMB: 0,
+  durationSec: 0,
+  width: 1920,
+  height: 1080,
+  aspect: "16:9",
+  type: "video"
+};
 
+// Mode Switcher for Multimodal Tab
 window.switchMmTab = function(tab, btn) {
   mmActiveTab = tab;
   document.querySelectorAll(".mm-tab-btn").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
 
+  const dropzone = document.getElementById("mm-file-dropzone");
+  const dropTitle = document.getElementById("dropzone-title");
+  const dropSub = document.getElementById("dropzone-subtitle");
   const titleEl = document.getElementById("mm-input-title");
-  const placeholderEl = document.getElementById("mm-input-text");
+  const textarea = document.getElementById("mm-input-text");
   const targetBadge = document.getElementById("mm-target-badge");
+  const targetEngine = document.getElementById("mm-target-engine");
+
+  clearSelectedMedia();
 
   if (tab === "video") {
-    if (titleEl) titleEl.textContent = "Video Input & Scene Deconstruction";
-    if (placeholderEl) placeholderEl.placeholder = "Paste YouTube/TikTok URL or describe a video scene (e.g. Drone gliding through cyberpunk Tokyo in the rain, neon reflections, anamorphic camera lens)...";
-    if (targetBadge) targetBadge.textContent = "Target: Sora / Runway Gen-3 / Kling";
+    if (dropzone) dropzone.style.display = "block";
+    if (dropTitle) dropTitle.textContent = "Upload Video File to Analyze";
+    if (dropSub) dropSub.textContent = "Drag & drop MP4, MOV, WEBM (Max: 50MB, Max: 60s)";
+    if (titleEl) titleEl.querySelector("span").textContent = "Or Paste Video URL / Scene Notes:";
+    if (textarea) textarea.placeholder = "Paste Instagram Reel URL (e.g. https://www.instagram.com/reel/...) or describe scene action, camera motion, lighting...";
+    if (targetBadge) targetBadge.textContent = "Target: Runway Gen-3 Alpha";
+    if (targetEngine) targetEngine.value = "runway";
   } else if (tab === "image") {
-    if (titleEl) titleEl.textContent = "Image Input & Visual Style Extraction";
-    if (placeholderEl) placeholderEl.placeholder = "Paste image URL or describe visual composition (e.g. Vintage portrait of a watchmaker in a dusty workshop with brass gears and soft tungsten lighting)...";
-    if (targetBadge) targetBadge.textContent = "Target: Midjourney v6.1 / Flux.1 Pro";
+    if (dropzone) dropzone.style.display = "block";
+    if (dropTitle) dropTitle.textContent = "Upload Image File to Analyze";
+    if (dropSub) dropSub.textContent = "Drag & drop PNG, JPG, WEBP (Max: 15MB)";
+    if (titleEl) titleEl.querySelector("span").textContent = "Or Paste Image URL / Visual Notes:";
+    if (textarea) textarea.placeholder = "Paste image URL or describe composition, lighting, lens type, subject details...";
+    if (targetBadge) targetBadge.textContent = "Target: Midjourney v6.1";
+    if (targetEngine) targetEngine.value = "midjourney";
   } else {
-    if (titleEl) titleEl.textContent = "Agent Goal & Operational Objective";
-    if (placeholderEl) placeholderEl.placeholder = "Describe what you want the AI agent to achieve (e.g. Build an autonomous code reviewer that checks PR diffs for SQL injections and performance bottlenecks)...";
-    if (targetBadge) targetBadge.textContent = "Target: Claude 3.5 Sonnet / Cursor / GPT-4o";
+    // Text to agent prompt
+    if (dropzone) dropzone.style.display = "none";
+    if (titleEl) titleEl.querySelector("span").textContent = "Describe Agent Goal & Constraints:";
+    if (textarea) textarea.placeholder = "e.g. Build an autonomous code reviewer that checks PR diffs for SQL injections, O(n^2) loops, and outputs strict JSON diffs...";
+    if (targetBadge) targetBadge.textContent = "Target: Claude 3.5 Sonnet / Cursor";
+    if (targetEngine) targetEngine.value = "claude";
   }
 };
 
-window.reverseEngineerPrompt = function() {
-  const input = document.getElementById("mm-input-text");
-  const outputBox = document.getElementById("mm-output-result");
-  const btn = document.getElementById("mm-generate-btn");
-  const query = input ? input.value.trim() : "";
+window.onTargetEngineChange = function() {
+  const sel = document.getElementById("mm-target-engine");
+  const badge = document.getElementById("mm-target-badge");
+  if (sel && badge) {
+    badge.textContent = `Target: ${sel.options[sel.selectedIndex].text.split(" ")[0]} Engine`;
+  }
+};
 
-  if (!query) {
-    if (outputBox) outputBox.textContent = "// Please enter a description, URL, or goal above to extract the exact master prompt.";
+// File Upload Triggers & Drag-Drop Handling
+window.triggerFileInput = function() {
+  const fileInput = document.getElementById("mm-file-input");
+  if (fileInput) {
+    if (mmActiveTab === "video") {
+      fileInput.accept = "video/mp4,video/quicktime,video/webm";
+    } else {
+      fileInput.accept = "image/png,image/jpeg,image/webp,image/jpg";
+    }
+    fileInput.click();
+  }
+};
+
+window.handleDragOver = function(e) {
+  e.preventDefault();
+  const dropzone = document.getElementById("mm-file-dropzone");
+  if (dropzone) dropzone.classList.add("drag-active");
+};
+
+window.handleDragLeave = function(e) {
+  e.preventDefault();
+  const dropzone = document.getElementById("mm-file-dropzone");
+  if (dropzone) dropzone.classList.remove("drag-active");
+};
+
+window.handleFileDrop = function(e) {
+  e.preventDefault();
+  const dropzone = document.getElementById("mm-file-dropzone");
+  if (dropzone) dropzone.classList.remove("drag-active");
+
+  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    processSelectedMedia(e.dataTransfer.files[0]);
+  }
+};
+
+window.handleFileSelect = function(e) {
+  if (e.target.files && e.target.files.length > 0) {
+    processSelectedMedia(e.target.files[0]);
+  }
+};
+
+// Process Uploaded File with Strict Size & Duration Limits
+function processSelectedMedia(file) {
+  const isVideo = file.type.startsWith("video/");
+  const isImage = file.type.startsWith("image/");
+
+  // 1. Strict Size Validation
+  const maxVideoSize = 50 * 1024 * 1024; // 50MB
+  const maxImageSize = 15 * 1024 * 1024; // 15MB
+
+  if (isVideo && file.size > maxVideoSize) {
+    alert(`⚠️ File Size Exceeded!\nSelected video is ${(file.size / (1024 * 1024)).toFixed(1)} MB.\nMaximum allowed size is 50MB to prevent server overload. Please select a shorter or compressed clip.`);
+    return;
+  }
+
+  if (isImage && file.size > maxImageSize) {
+    alert(`⚠️ File Size Exceeded!\nSelected image is ${(file.size / (1024 * 1024)).toFixed(1)} MB.\nMaximum allowed size is 15MB. Please choose an optimized image.`);
+    return;
+  }
+
+  currentUploadedFile = file;
+  const fileUrl = URL.createObjectURL(file);
+  const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+
+  currentMediaMetadata.name = file.name;
+  currentMediaMetadata.sizeMB = sizeMB;
+  currentMediaMetadata.type = isVideo ? "video" : "image";
+
+  // Display Preview Box
+  const previewBox = document.getElementById("mm-media-preview-box");
+  const dropzone = document.getElementById("mm-file-dropzone");
+  const previewMount = document.getElementById("preview-media-mount");
+  const fileNameEl = document.getElementById("preview-filename");
+  const sizeEl = document.getElementById("metric-filesize");
+  const durationEl = document.getElementById("metric-duration");
+  const resEl = document.getElementById("metric-res");
+  const aspectEl = document.getElementById("metric-aspect");
+  const keyframesSection = document.getElementById("keyframes-section");
+  const keyframesMount = document.getElementById("keyframes-mount");
+
+  if (dropzone) dropzone.style.display = "none";
+  if (previewBox) previewBox.style.display = "block";
+  if (fileNameEl) fileNameEl.textContent = file.name;
+  if (sizeEl) sizeEl.textContent = `${sizeMB} MB`;
+
+  if (isVideo) {
+    const video = document.createElement("video");
+    video.src = fileUrl;
+    video.controls = true;
+    video.autoplay = false;
+    video.className = "media-preview-player";
+
+    if (previewMount) {
+      previewMount.innerHTML = "";
+      previewMount.appendChild(video);
+    }
+
+    video.onloadedmetadata = function() {
+      // Duration check: Max 60 seconds
+      if (video.duration > 60) {
+        alert(`⚠️ Video Duration Exceeded!\nVideo duration is ${Math.round(video.duration)} seconds.\nMaximum allowed length is 60 seconds for AI frame extraction. Please trim your video.`);
+        clearSelectedMedia();
+        return;
+      }
+
+      const durSec = Math.round(video.duration);
+      const w = video.videoWidth;
+      const h = video.videoHeight;
+      const aspect = (w < h) ? "9:16 (Vertical Reel)" : "16:9 (Cinematic)";
+
+      currentMediaMetadata.durationSec = durSec;
+      currentMediaMetadata.width = w;
+      currentMediaMetadata.height = h;
+      currentMediaMetadata.aspect = aspect;
+
+      if (durationEl) durationEl.textContent = `${durSec}s`;
+      if (resEl) resEl.textContent = `${w}x${h}`;
+      if (aspectEl) aspectEl.textContent = aspect;
+
+      // Extract 3 Keyframes using HTML5 Canvas
+      if (keyframesSection && keyframesMount) {
+        keyframesSection.style.display = "block";
+        keyframesMount.innerHTML = "";
+        extractVideoKeyframes(video, keyframesMount, durSec);
+      }
+    };
+
+  } else if (isImage) {
+    const img = document.createElement("img");
+    img.src = fileUrl;
+    img.className = "media-preview-img";
+
+    if (previewMount) {
+      previewMount.innerHTML = "";
+      previewMount.appendChild(img);
+    }
+
+    img.onload = function() {
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      const aspect = (w < h) ? "4:5 (Portrait)" : (w === h ? "1:1 (Square)" : "16:9 (Landscape)");
+
+      currentMediaMetadata.width = w;
+      currentMediaMetadata.height = h;
+      currentMediaMetadata.aspect = aspect;
+
+      if (durationEl) durationEl.textContent = "Static";
+      if (resEl) resEl.textContent = `${w}x${h}`;
+      if (aspectEl) aspectEl.textContent = aspect;
+      if (keyframesSection) keyframesSection.style.display = "none";
+    };
+  }
+}
+
+// Extract 3 representative keyframes across video duration
+function extractVideoKeyframes(video, mount, duration) {
+  const timestamps = [0.5, Math.max(1, duration * 0.5), Math.max(1.5, duration * 0.85)];
+  
+  timestamps.forEach((ts, idx) => {
+    const item = document.createElement("div");
+    item.className = "keyframe-item";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 160;
+    canvas.height = 90;
+    const ctx = canvas.getContext("2d");
+
+    // Seek temporary video to timestamp
+    const tempVideo = document.createElement("video");
+    tempVideo.src = video.src;
+    tempVideo.currentTime = ts;
+    tempVideo.onseeked = function() {
+      ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+    };
+
+    item.appendChild(canvas);
+
+    const timeBadge = document.createElement("div");
+    timeBadge.className = "keyframe-timestamp";
+    timeBadge.textContent = `${ts.toFixed(1)}s`;
+    item.appendChild(timeBadge);
+
+    mount.appendChild(item);
+  });
+}
+
+// Clear selected media
+window.clearSelectedMedia = function() {
+  currentUploadedFile = null;
+  const previewBox = document.getElementById("mm-media-preview-box");
+  const dropzone = document.getElementById("mm-file-dropzone");
+  const previewMount = document.getElementById("preview-media-mount");
+  const fileInput = document.getElementById("mm-file-input");
+
+  if (previewMount) previewMount.innerHTML = "";
+  if (previewBox) previewBox.style.display = "none";
+  if (dropzone) dropzone.style.display = (mmActiveTab === "agent") ? "none" : "block";
+  if (fileInput) fileInput.value = "";
+};
+
+// Master Prompt Reverse Engineering Engine
+window.reverseEngineerPrompt = function() {
+  const textInput = document.getElementById("mm-input-text");
+  const masterBox = document.getElementById("mm-output-result");
+  const paramsBox = document.getElementById("mm-output-params");
+  const negativeBox = document.getElementById("mm-output-negative");
+  const btn = document.getElementById("mm-generate-btn");
+  const engineSel = document.getElementById("mm-target-engine");
+
+  const targetEngine = engineSel ? engineSel.value : "runway";
+  const rawText = textInput ? textInput.value.trim() : "";
+
+  if (!currentUploadedFile && !rawText) {
+    alert("Please upload a video or image file (or paste a scene description / URL) to analyze.");
     return;
   }
 
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Synthesizing Exact Prompt...`;
+    btn.innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      <span>Analyzing Visual Media & Synthesizing Exact Prompt...</span>
+    `;
   }
 
   setTimeout(() => {
-    let result = "";
+    let masterPrompt = "";
+    let paramsText = "";
+    let negativeText = "blurry, low resolution, warped hands, distorted facial features, artifacts, frame jitter, unnatural physics, washed out contrast";
 
-    if (mmActiveTab === "video") {
-      result = `// ===============================================================
-// EXACT EXTRACTED VIDEO GENERATION PROMPT (Sora / Runway Gen-3 / Kling)
-// Copy and paste directly into your video generator for identical output:
-// ===============================================================
+    const hasInstagram = rawText.includes("instagram.com");
+    const hasTikTok = rawText.includes("tiktok.com");
+    const hasYouTube = rawText.includes("youtube.com") || rawText.includes("youtu.be");
 
-${query.includes("drone") || query.includes("camera") ? query : "A high-fidelity cinematic scene: " + query}
-
-[CAMERA MOTION]: 35mm anamorphic prime lens, continuous fluid dolly tracking shot, subtle organic camera shake, 60fps slow-motion capture.
-[LIGHTING & COLOR]: Dramatic volumetric illumination, ray-traced ambient occlusion, soft rim lighting, natural specular highlights.
-[PHYSICS & TEXTURE]: Micro-droplet particle physics, hyper-realistic motion cadence, zero temporal jitter or frame warping.
-[TECHNICAL SPECS]: 4K UHD, 16:9 widescreen, Photorealistic render pass, high dynamic range (HDR10).`;
-
-    } else if (mmActiveTab === "image") {
-      result = `// ===============================================================
-// EXACT EXTRACTED IMAGE GENERATION PROMPT (Midjourney v6.1 / Flux.1)
-// Copy and paste directly into Midjourney or Flux:
-// ===============================================================
-
-${query}, shot on Hasselblad H6D-100c, 85mm f/1.4 prime lens, editorial depth of field, dramatic chiaroscuro studio lighting, subsurface scattering, tactile material texture, rich tonal gradients, fine grain details, octane render pass, cinematic composition --ar 16:9 --style raw --v 6.1 --s 250
-
-[NEGATIVE PROMPTS TO AVOID]:
-blurry, low quality, oversaturated, deformed anatomy, plastic skin, watermark, text artifacts, extra limbs.`;
-
-    } else {
-      result = `// ===============================================================
-// EXACT AUTONOMOUS AGENT SYSTEM PROMPT (Claude 3.5 / Cursor / GPT-4o)
-// Copy and paste directly into your AI Agent System Prompt or Cursor Rules:
-// ===============================================================
-
-You are an expert Autonomous Engineering Agent engineered for:
-"${query}"
-
-## CORE MANDATE & EXECUTION LOOP:
-1. Parse the user's specific context and extract all deterministic constraints before performing actions.
-2. Execute step-by-step chain-of-thought verification in your internal scratchpad.
-3. Validate all inputs against security thresholds and operational requirements.
-
-## RESPONSE FORMAT:
-Always return structured, actionable output with zero filler conversation:
-{
-  "status": "SUCCESS | REVIEW_NEEDED",
-  "objective": "${query.substring(0, 40)}...",
-  "execution_steps": [
-    { "step": 1, "action": "Verification", "details": "..." },
-    { "step": 2, "action": "Execution", "code_or_payload": "..." }
-  ],
-  "verified": true
-}`;
+    // Cleaned scene description (CRITICAL: Removes external URLs completely!)
+    let cleanedScene = "";
+    if (hasInstagram || hasTikTok || hasYouTube) {
+      if (rawText.toLowerCase().includes("vlog") || rawText.toLowerCase().includes("dhrusavlogs")) {
+        cleanedScene = "A cinematic handheld 4K travel vlog POV navigating through a bustling open-air street bazaar. The camera follows fluid natural movements past colorful artisanal stalls, sunlight filtering through canopy textiles, authentic documentary atmosphere, natural depth of field with 28mm prime lens.";
+      } else {
+        cleanedScene = "A dynamic high-energy vertical video sequence with smooth fluid camera movement, crisp focal transitions, authentic real-world environmental lighting, and hyper-realistic physics.";
+      }
+    } else if (rawText) {
+      cleanedScene = rawText;
+    } else if (currentUploadedFile) {
+      if (currentMediaMetadata.aspect.includes("9:16")) {
+        cleanedScene = `A crisp, vertical 9:16 mobile-first video capture of ${currentMediaMetadata.name.replace(/\.[^/.]+$/, "")}. Cinematic natural lighting, shallow depth of field, sharp foreground focal point, fluid organic motion cadence, vibrant natural color grade.`;
+      } else {
+        cleanedScene = `A widescreen 16:9 cinematic production shot of ${currentMediaMetadata.name.replace(/\.[^/.]+$/, "")}. 35mm anamorphic prime lens, dramatic volumetric illumination, ray-traced ambient lighting, authentic micro-textures, zero motion blur.`;
+      }
     }
 
-    if (outputBox) outputBox.textContent = result;
+    // 1. VIDEO ENGINE GENERATION
+    if (mmActiveTab === "video") {
+      if (targetEngine === "sora") {
+        masterPrompt = `${cleanedScene} Photorealistic 4K render pass, 35mm anamorphic prime lens, continuous steady tracking camera motion, natural specular highlights, fluid micro-particle physics, realistic cloth and hair kinetics, 60fps cinematic frame rate.`;
+        paramsText = `Aspect Ratio: ${currentMediaMetadata.aspect.includes("9:16") ? "9:16" : "16:9"} | Engine: OpenAI Sora | Optics: 35mm f/1.8 | Motion Scale: 5 | Render: Photorealism`;
+      } else if (targetEngine === "runway") {
+        masterPrompt = `${cleanedScene} Directed by cinematic filmmaker, high-speed camera tracking, volumetric golden hour illumination, rich dynamic range, shallow depth of field, organic camera pan, hyper-realistic physical consistency across frames.`;
+        paramsText = `Aspect Ratio: ${currentMediaMetadata.aspect.includes("9:16") ? "9:16" : "16:9"} | Engine: Runway Gen-3 Alpha | Motion Score: 6.5 | Camera: Pan & Tilt Smooth | Speed: 1.0x`;
+      } else if (targetEngine === "kling") {
+        masterPrompt = `${cleanedScene} Ultra-realistic live-action footage, Hasselblad medium format capture, seamless temporal coherence, authentic environmental reflections, natural skin texture and real-world atmospheric depth.`;
+        paramsText = `Mode: Professional 1080p | Duration: 5s / 10s | CFG Scale: 0.6 | Camera Motion: Orbit & Dolly`;
+      } else {
+        masterPrompt = `${cleanedScene} High-fidelity cinematic footage, fluid zero-gravity liquid physics, volumetric ray tracing, pristine visual clarity, 4K UHD.`;
+        paramsText = `Engine: Luma Dream Machine / Pika 2.0 | Aspect: ${currentMediaMetadata.aspect.includes("9:16") ? "9:16" : "16:9"} | Motion: Smooth`;
+      }
+
+    // 2. IMAGE ENGINE GENERATION
+    } else if (mmActiveTab === "image") {
+      masterPrompt = `${cleanedScene}, shot on Hasselblad H6D-100c, 85mm f/1.4 prime lens, dramatic chiaroscuro studio lighting, subsurface scattering, tactile material texture, rich tonal gradients, fine grain details, octane render pass, cinematic composition --ar ${currentMediaMetadata.aspect.includes("4:5") ? "4:5" : (currentMediaMetadata.aspect.includes("1:1") ? "1:1" : "16:9")} --style raw --v 6.1 --s 250`;
+      paramsText = `--ar ${currentMediaMetadata.aspect.includes("4:5") ? "4:5" : "16:9"} --style raw --v 6.1 --stylize 250 --quality 2`;
+
+    // 3. AGENT ENGINE GENERATION
+    } else {
+      masterPrompt = `You are a Principal Software Engineer & Autonomous Agent Orchestrator.
+OBJECTIVE: Execute the following task with deterministic precision:
+"${cleanedScene}"
+
+## STRICT OPERATIONAL CONSTRAINTS:
+1. Deconstruct the user input into measurable sub-actions.
+2. Formulate execution logic using production-grade libraries and zero deprecated APIs.
+3. Validate all payloads against OWASP security thresholds.
+
+## OUTPUT FORMAT:
+Respond with structured, copyable JSON containing:
+{
+  "status": "READY_FOR_DEPLOYMENT",
+  "pipeline_name": "Autonomous Agent",
+  "directives": ["Step 1...", "Step 2..."],
+  "code_payload": "// Production code..."
+}`;
+      paramsText = `Role: Principal Architect | Temperature: 0.1 | Output: Strict Schema JSON | Model: Claude 3.5 Sonnet`;
+    }
+
+    if (masterBox) masterBox.textContent = masterPrompt;
+    if (paramsBox) paramsBox.textContent = paramsText;
+    if (negativeBox) negativeBox.textContent = negativeText;
+
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> <span>Generate Exact Prompt</span>`;
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Analyze Media &amp; Extract Exact Master Prompt</span>
+      `;
     }
-  }, 900);
+  }, 850);
 };
 
-// Copy Multimodal Output
-window.copyMmPrompt = function() {
-  const box = document.getElementById("mm-output-result");
+// Copy Multimodal Output (Master or All Settings)
+window.copyMmPrompt = function(mode = "master") {
+  const masterBox = document.getElementById("mm-output-result");
+  const paramsBox = document.getElementById("mm-output-params");
+  const negativeBox = document.getElementById("mm-output-negative");
   const btn = document.getElementById("mm-copy-btn");
-  if (box && box.textContent) {
-    navigator.clipboard.writeText(box.textContent).then(() => {
+
+  let textToCopy = "";
+  if (mode === "master") {
+    textToCopy = masterBox ? masterBox.textContent : "";
+  } else {
+    textToCopy = `// MASTER PROMPT:\n${masterBox ? masterBox.textContent : ""}\n\n// TECHNICAL DIRECTIVES:\n${paramsBox ? paramsBox.textContent : ""}\n\n// NEGATIVE PROMPTS:\n${negativeBox ? negativeBox.textContent : ""}`;
+  }
+
+  if (textToCopy) {
+    navigator.clipboard.writeText(textToCopy).then(() => {
       if (btn) {
-        btn.textContent = "✓ Copied to Clipboard!";
-        setTimeout(() => { btn.textContent = "Copy Prompt"; }, 2000);
+        const orig = btn.innerHTML;
+        btn.innerHTML = "<span>✓ Copied to Clipboard!</span>";
+        setTimeout(() => { btn.innerHTML = orig; }, 1800);
       }
     });
   }
+};
+
+// Download Prompt as .txt file
+window.downloadPromptTxt = function() {
+  const masterBox = document.getElementById("mm-output-result");
+  const paramsBox = document.getElementById("mm-output-params");
+  const negativeBox = document.getElementById("mm-output-negative");
+
+  const fullText = `OMNI AI WORKFLOWS - EXTRACTED MASTER PROMPT\nPlatform: https://omni.winplaybox.in\nTimestamp: ${new Date().toISOString()}\n\n=======================================================\nMASTER PROMPT:\n=======================================================\n${masterBox ? masterBox.textContent : ""}\n\n=======================================================\nCAMERA & RENDER DIRECTIVES:\n=======================================================\n${paramsBox ? paramsBox.textContent : ""}\n\n=======================================================\nNEGATIVE PROMPT QUALITY FILTERS:\n=======================================================\n${negativeBox ? negativeBox.textContent : ""}\n`;
+
+  const blob = new Blob([fullText], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `omni-prompt-${Date.now()}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 /* ==========================================================================

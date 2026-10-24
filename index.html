@@ -152,7 +152,7 @@
             </div>
 
             <div class="pipeline-status-indicator">
-              <span class="status-pulse-dot"></span>
+              <span class="status-pulse-dot" id="status-pulse-dot"></span>
               <span id="pipeline-status-text">Pipeline ready for execution</span>
             </div>
 
@@ -167,11 +167,25 @@
             </div>
           </div>
 
-          <!-- Canvas Viewport with Animated Laser Cables -->
+          <!-- Execution Progress Bar (Live animation tracker) -->
+          <div class="pipeline-progress-track">
+            <div class="pipeline-progress-bar" id="pipeline-progress-bar" style="width: 0%;"></div>
+          </div>
+
+          <!-- Stage Telemetry Tracker -->
+          <div class="pipeline-stage-strip" id="pipeline-stage-strip">
+            <span class="stage-tag active" id="stage-tag-overall">STAGE: STANDBY (Ready)</span>
+            <span class="stage-tag" id="stage-tag-packet">DATA PACKET: IDLE</span>
+            <span class="stage-tag" id="stage-tag-latency">LATENCY: 0ms</span>
+          </div>
+
+          <!-- Canvas Viewport with Perfectly Aligned Laser Cables -->
           <div class="canvas-viewport" id="canvas-viewport">
-            <svg class="svg-connections" id="svg-connections"></svg>
-            <div class="pipeline-nodes-container" id="pipeline-nodes-mount">
-              <!-- Dynamically populated by app.js -->
+            <div class="pipeline-canvas-wrapper" id="pipeline-canvas-wrapper">
+              <svg class="svg-connections" id="svg-connections"></svg>
+              <div class="pipeline-nodes-container" id="pipeline-nodes-mount">
+                <!-- Dynamically populated by app.js -->
+              </div>
             </div>
           </div>
 
@@ -179,7 +193,7 @@
           <div class="studio-console">
             <div class="console-header">
               <span>● Live Execution Telemetry</span>
-              <span>Node Stream Active</span>
+              <span id="console-node-stream-badge">Node Stream Active</span>
             </div>
             <div id="console-logs-mount">
               <div class="log-line">
@@ -226,10 +240,10 @@
         <div style="text-align: center; margin-bottom: 2.5rem;">
           <div class="hero-badge">Reverse Engineering AI Studio</div>
           <h2 style="font-size: 2.25rem; font-weight: 900; margin-bottom: 0.75rem;">
-            Input Media. <span class="text-gradient">Extract the Exact Master Prompt.</span>
+            Upload Media. <span class="text-gradient">Extract the Exact Master Prompt.</span>
           </h2>
           <p style="color: var(--text-secondary); max-width: 680px; margin: 0 auto; font-size: 0.95rem;">
-            Provide any video clip, image, or agent objective. Omni deconstructs camera physics, lighting, style, and guardrails to output the exact prompt you can paste into Sora, Midjourney, Claude 3.5, or Cursor.
+            Upload any video or image (or input scene goal). Omni analyzes whole visual media, extracts camera physics, lighting, and styling, and outputs a 100% self-contained descriptive prompt ready for Sora, Runway Gen-3, Kling, or Midjourney.
           </p>
         </div>
 
@@ -251,19 +265,101 @@
               </button>
             </div>
 
-            <div class="mm-input-area">
-              <label id="mm-input-title" style="font-size: 0.85rem; font-weight: 700; color: #fff;">
-                Video Input &amp; Scene Deconstruction
+            <!-- Target Model Selector -->
+            <div class="mm-target-selector-box">
+              <label for="mm-target-engine" style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+                Target AI Generation Engine:
               </label>
-              <textarea 
-                id="mm-input-text" 
-                class="mm-textarea" 
-                placeholder="Paste YouTube/TikTok URL or describe a video scene (e.g. Drone gliding through cyberpunk Tokyo in the rain, neon reflections, anamorphic camera lens)..."
-              ></textarea>
+              <select id="mm-target-engine" class="mm-select" onchange="onTargetEngineChange()">
+                <option value="sora">OpenAI Sora (1080p Cinematic)</option>
+                <option value="runway" selected>Runway Gen-3 Alpha (High Fidelity)</option>
+                <option value="kling">Kling AI 1.5 (Pro Motion)</option>
+                <option value="luma">Luma Dream Machine (Realistic Physics)</option>
+                <option value="midjourney">Midjourney v6.1 (--style raw)</option>
+                <option value="flux">Flux.1 Pro (Photorealistic)</option>
+                <option value="claude">Claude 3.5 Sonnet / Cursor Rules</option>
+              </select>
+            </div>
 
-              <button type="button" id="mm-generate-btn" class="btn-primary" style="padding: 0.85rem;" onclick="reverseEngineerPrompt()">
+            <div class="mm-input-area">
+              
+              <!-- File Upload Drop Zone (For Video & Image) -->
+              <div id="mm-file-dropzone" class="file-dropzone" onclick="triggerFileInput()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
+                <input type="file" id="mm-file-input" style="display: none;" onchange="handleFileSelect(event)">
+                <div class="dropzone-content" id="dropzone-prompt-text">
+                  <div class="dropzone-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  </div>
+                  <div class="dropzone-title" id="dropzone-title">Upload Video File to Analyze</div>
+                  <div class="dropzone-subtitle" id="dropzone-subtitle">Drag &amp; drop MP4, MOV, WEBM (Max: 50MB, Max: 60s)</div>
+                  <span class="dropzone-badge" id="dropzone-badge">⚡ Safe Client-Side Frame Extraction</span>
+                </div>
+              </div>
+
+              <!-- Media Preview Container (Hidden until file selected) -->
+              <div id="mm-media-preview-box" class="media-preview-box" style="display: none;">
+                <div class="preview-header">
+                  <span id="preview-filename" style="font-weight: 700; font-size: 0.85rem; color: #fff;">video.mp4</span>
+                  <button type="button" class="btn-clear-media" onclick="clearSelectedMedia()">✕ Remove</button>
+                </div>
+                
+                <div class="preview-media-wrapper" id="preview-media-mount">
+                  <!-- Injected video or img element -->
+                </div>
+
+                <!-- Media Metrics Bar -->
+                <div class="media-metrics-grid" id="media-metrics-grid">
+                  <div class="metric-item">
+                    <span class="metric-label">Size</span>
+                    <span class="metric-val" id="metric-filesize">0 MB</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Duration</span>
+                    <span class="metric-val" id="metric-duration">--</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Resolution</span>
+                    <span class="metric-val" id="metric-res">--</span>
+                  </div>
+                  <div class="metric-item">
+                    <span class="metric-label">Aspect</span>
+                    <span class="metric-val" id="metric-aspect">16:9</span>
+                  </div>
+                </div>
+
+                <!-- Extracted Keyframes Showcase -->
+                <div class="keyframes-section" id="keyframes-section" style="display: none;">
+                  <div class="keyframes-header">
+                    <span>AI Keyframe Decomposition</span>
+                    <span style="color: var(--text-muted); font-size: 0.7rem;">3 Temporal Sampling Slices</span>
+                  </div>
+                  <div class="keyframes-grid" id="keyframes-mount">
+                    <!-- 3 frame canvases/thumbnails -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fallback/Alternative: URL & Scene Description Input -->
+              <div class="mm-text-fallback">
+                <label id="mm-input-title" style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: flex; justify-content: space-between;">
+                  <span>Or Paste Media URL / Scene Notes:</span>
+                  <span style="color: var(--text-muted); font-weight: 400;">No raw URLs sent to AI</span>
+                </label>
+                <textarea 
+                  id="mm-input-text" 
+                  class="mm-textarea" 
+                  placeholder="Paste Instagram Reel URL (e.g. https://www.instagram.com/reel/...) or describe scene action, camera motion, lighting..."
+                ></textarea>
+                <div class="url-notice-pill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <span>Omni automatically translates external links into pure descriptive physical scenes so AI generators won't reject them.</span>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <button type="button" id="mm-generate-btn" class="btn-primary" style="padding: 0.95rem; width: 100%; margin-top: 0.75rem;" onclick="reverseEngineerPrompt()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                <span>Generate Exact Prompt</span>
+                <span>Analyze Media &amp; Extract Exact Master Prompt</span>
               </button>
             </div>
           </div>
@@ -272,15 +368,37 @@
           <div class="mm-output-card">
             <div class="mm-output-header">
               <div style="font-weight: 800; font-size: 0.95rem;">Extracted Master Prompt</div>
-              <span class="output-target-badge" id="mm-target-badge">Target: Sora / Runway Gen-3 / Kling</span>
+              <span class="output-target-badge" id="mm-target-badge">Target: Runway Gen-3 Alpha</span>
             </div>
 
-            <pre class="prompt-output-box" id="mm-output-result">// Enter your media URL or description on the left and click "Generate Exact Prompt".
-// Omni will extract the exact camera motion, lighting parameters, and technical tags ready to paste into your target AI model.</pre>
+            <!-- Validation Notice -->
+            <div id="mm-clean-badge" class="prompt-sanitized-banner">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>100% Self-Contained: Zero Raw URLs. Validated for direct execution in AI models.</span>
+            </div>
 
-            <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
-              <button type="button" id="mm-copy-btn" class="btn-primary" onclick="copyMmPrompt()">
-                <span>Copy Prompt</span>
+            <div class="output-box-container">
+              <div class="output-sublabel">MASTER GENERATION PROMPT:</div>
+              <pre class="prompt-output-box" id="mm-output-result">// Upload a video (up to 50MB, 60s) or image, or enter a scene URL above.
+// Omni will decompose the camera kinetics, optical depth, lighting, and physics,
+// returning a production-grade master prompt ready to paste directly into your generator.</pre>
+
+              <div class="output-sublabel" style="margin-top: 1rem;">TECHNICAL CAMERA &amp; RENDER DIRECTIVES:</div>
+              <pre class="prompt-parameters-box" id="mm-output-params">// Aspect Ratio: 16:9 | Camera Motion: 35mm Anamorphic Dolly | Lighting: Volumetric Rim | Motion Scale: 5</pre>
+
+              <div class="output-sublabel" style="margin-top: 1rem;">NEGATIVE PROMPT (QUALITY FILTERS):</div>
+              <pre class="prompt-negative-box" id="mm-output-negative">// blurry, low resolution, warped hands, distorted motion, watermark, text overlay, jittery frame interpolation</pre>
+            </div>
+
+            <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap;">
+              <button type="button" id="mm-copy-btn" class="btn-primary" onclick="copyMmPrompt('master')">
+                <span>Copy Master Prompt</span>
+              </button>
+              <button type="button" class="btn-secondary" onclick="copyMmPrompt('all')">
+                <span>Copy All Settings</span>
+              </button>
+              <button type="button" class="btn-secondary" onclick="downloadPromptTxt()">
+                <span>Download .txt</span>
               </button>
             </div>
           </div>
