@@ -3,19 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Omni AI Workflows - Autonomous Prompt-to-Workflow Engine & Daily AI Blueprints</title>
-  <meta name="description" content="Generate production-ready autonomous workflows from any prompt. Visual pipeline canvas, step-by-step simulator, pre-built enterprise blueprints, and daily automated drops. Export to n8n, Zapier & Python.">
-  <meta name="keywords" content="AI workflows, prompt to workflow, automation platform, n8n blueprints, zapier ai, langchain workflows, winplaybox, omni ai">
+  <title>Omni AI - Autonomous Workflows &amp; Multimodal Prompt Engine</title>
+  <meta name="description" content="Black & White AI Agent Studio: Autonomous prompt-to-workflow synthesis with live animated data pipelines, and multimodal prompt reverse engineering for Video, Image, and Text.">
+  <meta name="keywords" content="AI agent workflows, prompt to workflow, video to prompt, image to prompt, sora prompt generator, midjourney prompt, n8n blueprints, omni ai, winplaybox">
   <link rel="canonical" href="https://omni.winplaybox.in/">
 
-  <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://omni.winplaybox.in/">
-  <meta property="og:title" content="Omni AI Workflows - Autonomous Prompt-to-Workflow Engine">
-  <meta property="og:description" content="Generate production-ready autonomous workflows from any natural language prompt. Export to n8n, Zapier, Python, and Node.js.">
-  <meta property="og:site_name" content="Omni AI Workflows">
+  <meta property="og:title" content="Omni AI - Autonomous Workflows &amp; Multimodal Prompt Engine">
+  <meta property="og:description" content="Synthesize autonomous AI workflows with animated laser data pipelines, or reverse-engineer video, image, and text prompts for exact reproduction.">
 
-  <!-- Google Fonts & Stylesheet -->
+  <!-- Google Fonts & B&W Stylesheet -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -23,233 +21,281 @@
 </head>
 <body>
 
-  <!-- Site Navigation Header -->
+  <!-- Minimalist B&W Header -->
   <header class="site-header">
     <div class="container nav-container">
       <a href="index.html" class="brand-logo">
-        <div class="brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-        </div>
-        <span>Omni<span class="text-gradient">Workflows</span></span>
+        <div class="brand-icon">Ω</div>
+        <span>OMNI<span style="color: var(--text-secondary); font-weight: 400; margin-left: 4px;">// AI AGENTS</span></span>
       </a>
 
       <nav>
         <ul class="nav-links">
-          <li><a href="#generator" class="nav-link">AI Generator</a></li>
-          <li><a href="#studio" class="nav-link">Canvas Studio</a></li>
-          <li><a href="#catalog" class="nav-link">Workflow Catalog</a></li>
+          <li><span class="nav-link active" onclick="switchMainMode('workflows', document.querySelectorAll('.mode-tab-btn')[0])">Workflows</span></li>
+          <li><span class="nav-link" onclick="switchMainMode('multimodal', document.querySelectorAll('.mode-tab-btn')[1])">Prompt Replicator</span></li>
+          <li><span class="nav-link" onclick="switchMainMode('predata', document.querySelectorAll('.mode-tab-btn')[2])">Pre-Data Bank</span></li>
           <li><a href="blog.html" class="nav-link">Daily Blog ↗</a></li>
-          <li><a href="https://winplaybox.in" target="_blank" rel="noopener" class="nav-link" style="color: var(--accent-cyan);">WinPlayBox Hub ↗</a></li>
+          <li><a href="https://winplaybox.in" target="_blank" rel="noopener" class="nav-link" style="color: var(--text-secondary);">WinPlayBox ↗</a></li>
         </ul>
       </nav>
 
       <div class="nav-actions">
-        <button type="button" class="btn-primary" onclick="document.getElementById('generator').scrollIntoView({ behavior: 'smooth' })">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          <span>Create Workflow</span>
+        <button type="button" class="btn-primary" onclick="switchMainMode('multimodal', document.querySelectorAll('.mode-tab-btn')[1])">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span>Extract Prompt</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section & Natural Language Prompt Generator -->
-  <section class="hero-section" id="generator">
-    <div class="container">
-      <div class="hero-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        Autonomous Real-Time AI Orchestration
-      </div>
-
-      <h1 class="hero-title">
-        Describe Any Workflow.<br>
-        <span class="text-gradient">Omni Builds &amp; Automates It.</span>
-      </h1>
-
-      <p class="hero-subtitle">
-        Turn plain English instructions into production-ready visual node pipelines. Powered by multi-agent reasoning, automated validation, and instant exports to n8n, Zapier &amp; Python.
-      </p>
-
-      <!-- Prompt Input Card -->
-      <div class="generator-card">
-        <form id="prompt-generator-form" class="prompt-form">
-          <input 
-            type="text" 
-            id="prompt-input" 
-            class="prompt-input" 
-            placeholder="e.g. Scrape YouTube audio, transcribe with Whisper, generate 5 viral tweets with Gemini, and post to Buffer..."
-            required
-            autocomplete="off"
-          >
-          <button type="submit" id="prompt-submit-btn" class="btn-primary prompt-submit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            <span>Synthesize Pipeline</span>
-          </button>
-        </form>
-
-        <!-- Quick 1-Click Prompt Chips -->
-        <div class="quick-prompts-wrapper">
-          <span class="quick-prompt-label">⚡ Trending Prompts:</span>
-          <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Scrape YouTube video, transcribe with Whisper, generate LinkedIn carousel & 5 tweets with Gemini')">
-            🎥 Video to Social Repurposing
-          </button>
-          <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Monitor Stripe webhooks for churn, query customer MRR in database, dispatch urgent Slack alert')">
-            💳 Stripe Churn Alert
-          </button>
-          <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Crawl competitor product pricing page every 6 hours, compare deltas, alert on Telegram')">
-            📊 Competitor Price Scraper
-          </button>
-          <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Ingest PDF contracts, extract critical liability clauses with Claude 3.5 Sonnet, sync to Supabase')">
-            📄 Contract AI Analysis
-          </button>
-        </div>
-      </div>
+  <!-- Main Mode Switcher Navigation -->
+  <div class="container">
+    <div class="main-mode-switcher">
+      <button type="button" class="mode-tab-btn active" onclick="switchMainMode('workflows', this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+        <span>Workflows Studio</span>
+      </button>
+      <button type="button" class="mode-tab-btn" onclick="switchMainMode('multimodal', this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        <span>Prompt Extractor (Video/Image/Text)</span>
+      </button>
+      <button type="button" class="mode-tab-btn" onclick="switchMainMode('predata', this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+        <span>Pre-Data Bank</span>
+      </button>
     </div>
-  </section>
+  </div>
 
-  <!-- Interactive Pipeline Studio & Visual Node Canvas -->
-  <section class="studio-section" id="studio">
-    <div class="container">
-      <div class="studio-card">
-        
-        <!-- Studio Toolbar -->
-        <div class="studio-toolbar">
-          <div class="workflow-meta">
-            <div class="workflow-title">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
-              <span id="current-workflow-title">Autonomous Content Repurposing Pipeline</span>
-            </div>
-            <span class="workflow-tag" id="current-workflow-domain">Social &amp; SEO</span>
-          </div>
+  <!-- VIEW 1: WORKFLOWS STUDIO (Default) -->
+  <div id="workflows-view">
+    <!-- Hero & Natural Language Prompt-to-Workflow Input -->
+    <section class="hero-section" id="generator">
+      <div class="container">
+        <div class="hero-badge">
+          <span>●</span> Autonomous AI Agent Orchestrator
+        </div>
 
-          <div class="studio-actions">
-            <button type="button" id="run-sim-btn" class="btn-primary" onclick="simulateWorkflowRun()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              <span>Run Test Pipeline</span>
+        <h1 class="hero-title">
+          Describe Any Workflow.<br>
+          <span class="text-gradient">Omni Builds &amp; Connects It.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Turn natural language instructions into high-speed autonomous node pipelines with animated data streams. Instant export to n8n, Zapier CLI, and LangChain Python.
+        </p>
+
+        <!-- Prompt Input Bar -->
+        <div class="generator-card">
+          <form id="prompt-generator-form" class="prompt-form">
+            <input 
+              type="text" 
+              id="prompt-input" 
+              class="prompt-input" 
+              placeholder="e.g. Scrape YouTube audio, transcribe with Whisper, generate 5 viral tweets with Gemini, and post to Buffer..."
+              required
+              autocomplete="off"
+            >
+            <button type="submit" id="prompt-submit-btn" class="btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>Synthesize Pipeline</span>
             </button>
-            <button type="button" class="btn-secondary" onclick="openExportModal()">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span>Export Code</span>
+          </form>
+
+          <!-- Quick 1-Click Prompt Chips -->
+          <div class="quick-prompts-wrapper">
+            <span class="quick-prompt-label">Quick Architectures:</span>
+            <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Scrape YouTube video, transcribe with Whisper, generate LinkedIn carousel & 5 tweets with Gemini')">
+              Video to Socials Repurposing
+            </button>
+            <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Monitor Stripe webhooks for churn, query customer MRR in database, dispatch urgent Slack alert')">
+              Stripe Churn Recovery
+            </button>
+            <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Crawl competitor product pricing page every 6 hours, compare deltas, alert on Telegram')">
+              Competitor Price Monitor
+            </button>
+            <button type="button" class="quick-prompt-chip" onclick="applyQuickPrompt('Ingest PDF contracts, extract critical liability clauses with Claude 3.5 Sonnet, sync to Supabase')">
+              Contract AI Analysis
             </button>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- Canvas Viewport -->
-        <div class="canvas-viewport" id="canvas-viewport">
-          <svg class="svg-connections" id="svg-connections"></svg>
-          <div class="pipeline-nodes-container" id="pipeline-nodes-mount">
-            <!-- Dynamic Nodes Injected by app.js -->
+    <!-- Studio & Interactive Canvas With Laser Data Animation -->
+    <section class="studio-section" id="studio">
+      <div class="container">
+        <div class="studio-card">
+          
+          <!-- Studio Toolbar -->
+          <div class="studio-toolbar">
+            <div class="workflow-meta">
+              <div class="workflow-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                <span id="current-workflow-title">Multi-Channel Autonomous Content Repurposing</span>
+              </div>
+              <span class="workflow-tag" id="current-workflow-domain">Social &amp; SEO</span>
+            </div>
+
+            <div class="pipeline-status-indicator">
+              <span class="status-pulse-dot"></span>
+              <span id="pipeline-status-text">Pipeline ready for execution</span>
+            </div>
+
+            <div class="studio-actions">
+              <button type="button" id="run-sim-btn" class="btn-primary" onclick="simulateWorkflowRun()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>Run Test Pipeline</span>
+              </button>
+              <button type="button" class="btn-secondary" onclick="openExportModal()">
+                <span>Export Blueprint</span>
+              </button>
+            </div>
           </div>
+
+          <!-- Canvas Viewport with Animated Laser Cables -->
+          <div class="canvas-viewport" id="canvas-viewport">
+            <svg class="svg-connections" id="svg-connections"></svg>
+            <div class="pipeline-nodes-container" id="pipeline-nodes-mount">
+              <!-- Dynamically populated by app.js -->
+            </div>
+          </div>
+
+          <!-- Live Telemetry Drawer -->
+          <div class="studio-console">
+            <div class="console-header">
+              <span>● Live Execution Telemetry</span>
+              <span>Node Stream Active</span>
+            </div>
+            <div id="console-logs-mount">
+              <div class="log-line">
+                <span class="log-time">[Init]</span>
+                <span class="log-source">[SYSTEM]</span>
+                <span class="log-msg">Omni Black &amp; White Engine active. Animated data pipeline telemetry ready.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Workflows Catalog -->
+    <section class="catalog-section" id="catalog">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+          <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">Pre-Built Enterprise Workflows</h2>
+          <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 0.9rem;">
+            Battle-tested automation architectures. Click any blueprint to load directly into the visual canvas.
+          </p>
         </div>
 
-        <!-- Real-Time Execution Console Drawer -->
-        <div class="studio-console">
-          <div class="console-header">
-            <span>⚡ Execution Engine Telemetry &amp; Logs</span>
-            <span style="color: var(--accent-emerald);">● Simulator Active</span>
+        <div class="category-tabs">
+          <button type="button" class="cat-tab-btn active" onclick="filterCatalog('all', this)">All Workflows</button>
+          <button type="button" class="cat-tab-btn" onclick="filterCatalog('Social', this)">Social &amp; SEO</button>
+          <button type="button" class="cat-tab-btn" onclick="filterCatalog('E-Commerce', this)">E-Commerce</button>
+          <button type="button" class="cat-tab-btn" onclick="filterCatalog('Developer', this)">Developer Tools</button>
+          <button type="button" class="cat-tab-btn" onclick="filterCatalog('Productivity', this)">Productivity</button>
+        </div>
+
+        <div class="workflows-grid" id="catalog-grid-mount">
+          <!-- Rendered by app.js -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- VIEW 2: MULTIMODAL PROMPT REPLICATOR (Video / Image / Text) -->
+  <div id="multimodal-view" style="display: none;">
+    <section class="multimodal-studio-section">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+          <div class="hero-badge">Reverse Engineering AI Studio</div>
+          <h2 style="font-size: 2.25rem; font-weight: 900; margin-bottom: 0.75rem;">
+            Input Media. <span class="text-gradient">Extract the Exact Master Prompt.</span>
+          </h2>
+          <p style="color: var(--text-secondary); max-width: 680px; margin: 0 auto; font-size: 0.95rem;">
+            Provide any video clip, image, or agent objective. Omni deconstructs camera physics, lighting, style, and guardrails to output the exact prompt you can paste into Sora, Midjourney, Claude 3.5, or Cursor.
+          </p>
+        </div>
+
+        <div class="mm-grid">
+          <!-- Input Column -->
+          <div class="mm-card">
+            <div class="mm-tabs">
+              <button type="button" class="mm-tab-btn active" data-tab="video" onclick="switchMmTab('video', this)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                <span>Video to Prompt</span>
+              </button>
+              <button type="button" class="mm-tab-btn" data-tab="image" onclick="switchMmTab('image', this)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>Image to Prompt</span>
+              </button>
+              <button type="button" class="mm-tab-btn" data-tab="agent" onclick="switchMmTab('agent', this)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                <span>Text to Agent Prompt</span>
+              </button>
+            </div>
+
+            <div class="mm-input-area">
+              <label id="mm-input-title" style="font-size: 0.85rem; font-weight: 700; color: #fff;">
+                Video Input &amp; Scene Deconstruction
+              </label>
+              <textarea 
+                id="mm-input-text" 
+                class="mm-textarea" 
+                placeholder="Paste YouTube/TikTok URL or describe a video scene (e.g. Drone gliding through cyberpunk Tokyo in the rain, neon reflections, anamorphic camera lens)..."
+              ></textarea>
+
+              <button type="button" id="mm-generate-btn" class="btn-primary" style="padding: 0.85rem;" onclick="reverseEngineerPrompt()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                <span>Generate Exact Prompt</span>
+              </button>
+            </div>
           </div>
-          <div id="console-logs-mount">
-            <div class="log-line">
-              <span class="log-time">[Ready]</span>
-              <span class="log-info">[ORCHESTRATOR]</span>
-              <span>Omni Engine initialized. Type any prompt above or click "Run Test Pipeline".</span>
+
+          <!-- Output Master Prompt Column -->
+          <div class="mm-output-card">
+            <div class="mm-output-header">
+              <div style="font-weight: 800; font-size: 0.95rem;">Extracted Master Prompt</div>
+              <span class="output-target-badge" id="mm-target-badge">Target: Sora / Runway Gen-3 / Kling</span>
+            </div>
+
+            <pre class="prompt-output-box" id="mm-output-result">// Enter your media URL or description on the left and click "Generate Exact Prompt".
+// Omni will extract the exact camera motion, lighting parameters, and technical tags ready to paste into your target AI model.</pre>
+
+            <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+              <button type="button" id="mm-copy-btn" class="btn-primary" onclick="copyMmPrompt()">
+                <span>Copy Prompt</span>
+              </button>
             </div>
           </div>
         </div>
-
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <!-- Pre-Built Enterprise Workflows Catalog -->
-  <section class="catalog-section" id="catalog">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">Production Library</div>
-        <h2 class="section-title">Pre-Built Enterprise Workflows</h2>
-        <p class="section-desc">Battle-tested automation blueprints designed for immediate deployment. Load directly into the studio or export to your workflow runner.</p>
-      </div>
-
-      <!-- Domain Tabs -->
-      <div class="category-tabs">
-        <button type="button" class="cat-tab-btn active" onclick="filterCatalog('all', this)">All Workflows</button>
-        <button type="button" class="cat-tab-btn" onclick="filterCatalog('Social', this)">Social &amp; SEO</button>
-        <button type="button" class="cat-tab-btn" onclick="filterCatalog('E-Commerce', this)">E-Commerce</button>
-        <button type="button" class="cat-tab-btn" onclick="filterCatalog('Developer', this)">Developer Tools</button>
-        <button type="button" class="cat-tab-btn" onclick="filterCatalog('Sales', this)">Sales &amp; CRM</button>
-      </div>
-
-      <!-- Catalog Cards Grid -->
-      <div class="workflows-grid" id="catalog-grid-mount">
-        <!-- Rendered by app.js -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Daily Automated Workflows Blog Preview Section -->
-  <section class="blog-preview-section" id="blog">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">Automated Publications</div>
-        <h2 class="section-title">Daily Production Workflows Blog</h2>
-        <p class="section-desc">Every day, Omni automatically generates and documents complete production workflow architectures, code blueprints, and execution schemas.</p>
-      </div>
-
-      <div class="articles-grid">
-        <article class="article-card">
-          <div class="article-meta">
-            <span>Oct 24, 2026</span> &bull; <span>Social &amp; Content Automation</span>
-          </div>
-          <h3 class="article-title">
-            <a href="blog.html#repurposing">Autonomous Multi-Channel Content Repurposing Pipeline (YouTube to 5 Tweets, LinkedIn &amp; Newsletter)</a>
-          </h3>
-          <p class="article-excerpt">
-            Complete technical breakdown of an autonomous pipeline that listens to YouTube video releases, transcribes via Whisper, formulates targeted hooks with Gemini 1.5 Pro, and dispatches across platforms.
+  <!-- VIEW 3: PRE-DATA CURATED PROMPT BANK -->
+  <div id="predata-view" style="display: none;">
+    <section class="pre-data-section">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+          <div class="hero-badge">Curated Production Library</div>
+          <h2 style="font-size: 2.25rem; font-weight: 900; margin-bottom: 0.75rem;">
+            Pre-Data Prompt &amp; Agent Bank
+          </h2>
+          <p style="color: var(--text-secondary); max-width: 680px; margin: 0 auto; font-size: 0.95rem;">
+            Battle-tested, copy-paste prompts engineered to generate pristine, reproducible output in Sora, Runway, Midjourney v6, Flux.1, and Claude 3.5 Sonnet.
           </p>
-          <a href="blog.html#repurposing" class="btn-secondary" style="align-self: flex-start; font-size: 0.8rem;">
-            <span>Read Architecture Blueprint &rarr;</span>
-          </a>
-        </article>
+        </div>
 
-        <article class="article-card">
-          <div class="article-meta">
-            <span>Oct 23, 2026</span> &bull; <span>E-Commerce Intelligence</span>
-          </div>
-          <h3 class="article-title">
-            <a href="blog.html#price-monitor">Real-Time Competitor Price Monitoring &amp; Instant Telegram Alert Bot</a>
-          </h3>
-          <p class="article-excerpt">
-            How we engineered a scheduled headless Chromium crawler with threshold markdown rules, price delta evaluation, and sub-second Telegram/Slack webhook dispatches.
-          </p>
-          <a href="blog.html#price-monitor" class="btn-secondary" style="align-self: flex-start; font-size: 0.8rem;">
-            <span>Read Architecture Blueprint &rarr;</span>
-          </a>
-        </article>
-
-        <article class="article-card">
-          <div class="article-meta">
-            <span>Oct 22, 2026</span> &bull; <span>Customer Operations</span>
-          </div>
-          <h3 class="article-title">
-            <a href="blog.html#support-triage">AI Support Ticket Triage with Hybrid Pinecone Vector Search &amp; Escalation</a>
-          </h3>
-          <p class="article-excerpt">
-            Architecting an enterprise support copilot that reads incoming tickets, queries company vector stores, computes confidence scores, and auto-resolves or alerts engineers.
-          </p>
-          <a href="blog.html#support-triage" class="btn-secondary" style="align-self: flex-start; font-size: 0.8rem;">
-            <span>Read Architecture Blueprint &rarr;</span>
-          </a>
-        </article>
+        <div class="prompts-grid" id="prompts-bank-mount">
+          <!-- Rendered by app.js -->
+        </div>
       </div>
+    </section>
+  </div>
 
-      <div style="text-align: center; margin-top: 3rem;">
-        <a href="blog.html" class="btn-primary">
-          <span>Explore All Daily Workflows on Blog &rarr;</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Export Blueprint Modal Dialog -->
+  <!-- Export Blueprint Modal -->
   <div class="modal-backdrop" id="export-modal">
     <div class="modal-dialog">
       <div class="modal-header">
@@ -260,7 +306,7 @@
       </div>
       <div class="modal-body">
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-          This standardized JSON blueprint can be imported into <strong>n8n</strong>, adapted into <strong>Zapier CLI</strong>, or executed directly using <strong>LangChain / LangGraph</strong>:
+          Standardized JSON schema compatible with <strong>n8n</strong>, <strong>Zapier CLI</strong>, and <strong>LangChain</strong>:
         </p>
         <pre class="code-export-box" id="export-code-box"></pre>
         <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
@@ -271,40 +317,39 @@
     </div>
   </div>
 
-  <!-- Global Footer with Ecosystem & Legal Links -->
+  <!-- Minimalist B&W Footer -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
           <div class="brand-logo">
-            <div class="brand-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-            </div>
-            <span>Omni<span class="text-gradient">Workflows</span></span>
+            <div class="brand-icon">Ω</div>
+            <span>OMNI<span style="color: var(--text-secondary); font-weight: 400; margin-left: 4px;">// WORKFLOWS</span></span>
           </div>
           <p>
-            The autonomous AI workflow synthesis engine within the WinPlayBox sovereign developer ecosystem. Turning human intent into production-grade orchestration pipelines.
+            Autonomous AI Workflow Synthesis Engine &amp; Multimodal Reverse Prompt Studio. Part of the WinPlayBox sovereign developer ecosystem.
           </p>
         </div>
 
         <div>
-          <h4 class="footer-col-title">Product</h4>
+          <h4 class="footer-col-title">Capabilities</h4>
           <ul class="footer-links-list">
-            <li><a href="#generator">Prompt Synthesizer</a></li>
-            <li><a href="#studio">Visual Canvas</a></li>
-            <li><a href="#catalog">Workflows Catalog</a></li>
+            <li><a href="#" onclick="switchMainMode('workflows', document.querySelectorAll('.mode-tab-btn')[0]); return false;">Workflows Studio</a></li>
+            <li><a href="#" onclick="switchMainMode('multimodal', document.querySelectorAll('.mode-tab-btn')[1]); return false;">Video to Prompt</a></li>
+            <li><a href="#" onclick="switchMainMode('multimodal', document.querySelectorAll('.mode-tab-btn')[1]); return false;">Image to Prompt</a></li>
+            <li><a href="#" onclick="switchMainMode('predata', document.querySelectorAll('.mode-tab-btn')[2]); return false;">Pre-Data Bank</a></li>
             <li><a href="blog.html">Daily Workflows Blog</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="footer-col-title">Ecosystem</h4>
+          <h4 class="footer-col-title">WinPlayBox Network</h4>
           <ul class="footer-links-list">
-            <li><a href="https://winplaybox.in" target="_blank" rel="noopener">WinPlayBox Main Hub ↗</a></li>
+            <li><a href="https://winplaybox.in" target="_blank" rel="noopener">WinPlayBox Sovereign Hub ↗</a></li>
             <li><a href="https://tutorials.winplaybox.in" target="_blank" rel="noopener">WinPlayBox Tutorials ↗</a></li>
             <li><a href="https://blog.winplaybox.in" target="_blank" rel="noopener">WinPlayBox Tech Blog ↗</a></li>
             <li><a href="https://ovd.winplaybox.in" target="_blank" rel="noopener">OVD Media Transcoder ↗</a></li>
-            <li><a href="https://latestnewsnx.com" target="_blank" rel="noopener">LatestNewsNX Global ↗</a></li>
+            <li><a href="https://latestnewsnx.com" target="_blank" rel="noopener">LatestNewsNX News ↗</a></li>
           </ul>
         </div>
 
@@ -330,7 +375,6 @@
     </div>
   </footer>
 
-  <!-- Core Engine Scripts -->
   <script src="js/app.js"></script>
 </body>
 </html>

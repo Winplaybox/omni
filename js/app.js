@@ -1,7 +1,8 @@
 /**
- * OMNI AI WORKFLOWS - CORE ENGINE & INTERACTIVE CANVAS CONTROLLER
+ * OMNI AI WORKFLOWS & MULTIMODAL PROMPT ENGINE
  * Platform: omni.winplaybox.in
- * Author: WinPlayBox Principal Software Engineering Team
+ * Aesthetic: Black & White Minimalist AI Agent Orchestrator
+ * Features: Animated Laser Data Pipelines, Video/Image/Text Prompt Extraction & Pre-Data Bank
  */
 
 // Production-Grade Pre-Built Workflows Catalog
@@ -14,11 +15,11 @@ const PRESET_WORKFLOWS = [
     description: "Ingests YouTube or podcast audio, extracts timestamped key insights with Gemini 1.5 Pro, synthesizes a LinkedIn carousel, 5 Twitter threads, and dispatches to Buffer & Ghost CMS.",
     tags: ["Gemini 1.5", "YouTube API", "Buffer", "Ghost CMS", "Automation"],
     nodes: [
-      { id: "n1", type: "trigger", title: "New Video Published", service: "YouTube RSS / Webhook", badge: "Trigger" },
-      { id: "n2", type: "ai", title: "Audio Transcription", service: "Whisper Large v3", badge: "AI Model" },
+      { id: "n1", type: "trigger", title: "New Video Ingestion", service: "YouTube RSS / Webhook", badge: "Trigger" },
+      { id: "n2", type: "ai", title: "Audio Transcription", service: "Whisper Large v3", badge: "AI Speech" },
       { id: "n3", type: "ai", title: "Multi-Format Synthesis", service: "Gemini 1.5 Pro", badge: "AI Reasoning" },
-      { id: "n4", type: "action", title: "Carousel Image Gen", service: "Canva / Remotion", badge: "Asset Builder" },
-      { id: "n5", type: "output", title: "Cross-Platform Dispatch", service: "Twitter, LinkedIn, Ghost", badge: "Delivery" }
+      { id: "n4", type: "action", title: "Visual Slide Builder", service: "Remotion Engine", badge: "Asset Builder" },
+      { id: "n5", type: "output", title: "Multi-Platform Dispatch", service: "Twitter, LinkedIn, Ghost", badge: "Delivery" }
     ]
   },
   {
@@ -96,22 +97,94 @@ const PRESET_WORKFLOWS = [
   }
 ];
 
-// Current Active Workflow State
+// Pre-Data Curated Prompt Bank (Ready to Copy into Any AI Agent)
+const PRESET_PROMPTS_BANK = [
+  {
+    id: "p1",
+    type: "video",
+    title: "Cinematic Sci-Fi Tokyo Cyberpunk Drone Tracking Shot",
+    target: "Sora / Runway Gen-3 / Kling AI",
+    promptText: "A sweeping, high-altitude cinematic drone shot gliding smoothly through a neon-lit, rain-slicked Tokyo street in 2049. Realistic puddle reflections of holographic kanji billboards. An autonomous matte-black flying vehicle weaves between towering brutalist skyscrapers. Volumetric fog cutting through searchlights, anamorphic lens flare, 35mm film grain, 60fps slow-motion capture, hyper-realistic physics, zero motion blur, 8k resolution.",
+    parameters: "Aspect Ratio: 16:9 | Camera: FPV Drone Orbit | Lighting: Neon Rain Reflections | Engine: Runway Gen-3 Alpha"
+  },
+  {
+    id: "p2",
+    type: "image",
+    title: "Hyper-Realistic Medium Format Studio Portrait",
+    target: "Midjourney v6.1 / Flux.1 Pro",
+    promptText: "Intimate close-up studio portrait of an elderly watchmaker in his workshop, intricate brass watch gears and microscopic dials resting on his weathered fingers. Dramatic chiaroscuro lighting, soft dust motes illuminated by single tungsten lamp, Hasselblad H6D-100c, 100mm f/2.2 lens, shallow depth of field, tactile skin texture, subsurface scattering, authentic micro-details --ar 4:5 --style raw --v 6.1",
+    parameters: "--ar 4:5 --style raw --v 6.1 --s 250"
+  },
+  {
+    id: "p3",
+    type: "agent",
+    title: "Senior Full-Stack Code Reviewer & Architecture Agent",
+    target: "Claude 3.5 Sonnet / Cursor / GPT-4o",
+    promptText: `You are an elite Principal Software Engineer conducting strict code reviews.
+OBJECTIVE: Audit the user-supplied code diff for:
+1. Performance bottlenecks (O(n^2) operations, unnecessary re-renders, memory leaks).
+2. Security vulnerabilities (OWASP Top 10, SQLi, SSRF, XSS, insecure token storage).
+3. Production architectural clean code compliance.
+
+OUTPUT FORMAT:
+Respond exclusively with structured JSON:
+{
+  "summary": "Brief 2-sentence architectural verdict",
+  "critical_issues": [{ "line": 42, "category": "Security", "issue": "...", "fix_diff": "..." }],
+  "recommended_refactors": [{ "symbol": "fetchData", "reason": "...", "suggested_code": "..." }],
+  "approval_status": "APPROVED | CHANGES_REQUIRED"
+}`,
+    parameters: "Temperature: 0.1 | Role: Principal Software Engineer | Output: Strict JSON Schema"
+  },
+  {
+    id: "p4",
+    type: "video",
+    title: "Hyper-Dynamic Macro Action Product Commercial",
+    target: "Sora / Luma Dream Machine",
+    promptText: "Slow-motion macro shot of an iced espresso tonic beverage splashing inside a crystal cut glass. Crisp ice cubes collide in zero-gravity slow motion, droplets suspended in mid-air with refractive light caustics. Backlit with golden studio light, high-speed Phantom Flex 4K camera at 1000fps, crisp liquid physics, premium commercial advertisement aesthetic.",
+    parameters: "Frame Rate: 1000fps simulation | Lighting: Golden Hour Rim Caustics"
+  },
+  {
+    id: "p5",
+    type: "agent",
+    title: "Autonomous Competitor Reverse Engineering & SEO Agent",
+    target: "ChatGPT / Claude 3.5 / DeepSeek",
+    promptText: `You are an autonomous SEO intelligence strategist.
+Given any competitor domain or URL:
+1. Deconstruct their keyword cluster hierarchy and semantic content graph.
+2. Identify untapped programmatic search intent gaps where ranking difficulty is < 30.
+3. Formulate a 5-pillar editorial master plan with schema specifications (FAQPage, HowTo, Article).
+4. Provide the exact Markdown outline for an article designed to outrank the target URL.`,
+    parameters: "Role: Search Architect | Methodology: Semantic Entity Clustering"
+  },
+  {
+    id: "p6",
+    type: "image",
+    title: "Sleek Dark Mode Neumorphic Dashboard Interface",
+    target: "Flux.1 / Midjourney",
+    promptText: "Clean, ultra-minimalist dark mode analytics SaaS dashboard interface on MacBook Pro M3 display, glowing cyan and violet line graphs, glassmorphic floating cards, crisp typography, Figma UI design showcase, Behance trending UI/UX, isometric perspective, high-tech dark studio background --ar 16:9 --style raw",
+    parameters: "--ar 16:9 --v 6.1"
+  }
+];
+
+// Current State
 let currentWorkflow = PRESET_WORKFLOWS[0];
 let isSimulating = false;
+let activeMode = "workflows"; // 'workflows' | 'multimodal' | 'predata'
 
-// DOM Ready Initialization
+// DOM Initialization
 document.addEventListener("DOMContentLoaded", () => {
   renderCanvas(currentWorkflow);
   renderCatalog(PRESET_WORKFLOWS);
+  renderPromptBank(PRESET_PROMPTS_BANK);
   setupEventListeners();
 });
 
-// Setup Global Event Listeners
+// Setup Event Handlers
 function setupEventListeners() {
-  const form = document.getElementById("prompt-generator-form");
-  if (form) {
-    form.addEventListener("submit", (e) => {
+  const promptForm = document.getElementById("prompt-generator-form");
+  if (promptForm) {
+    promptForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const input = document.getElementById("prompt-input");
       if (input && input.value.trim()) {
@@ -121,7 +194,26 @@ function setupEventListeners() {
   }
 }
 
-// Quick Prompt Handler
+// Mode Switcher (Workflows / Prompt Extractor / Pre-Data Bank)
+window.switchMainMode = function(mode, btn) {
+  activeMode = mode;
+  document.querySelectorAll(".mode-tab-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+
+  const wfSection = document.getElementById("workflows-view");
+  const mmSection = document.getElementById("multimodal-view");
+  const predataSection = document.getElementById("predata-view");
+
+  if (wfSection) wfSection.style.display = (mode === "workflows") ? "block" : "none";
+  if (mmSection) mmSection.style.display = (mode === "multimodal") ? "block" : "none";
+  if (predataSection) predataSection.style.display = (mode === "predata") ? "block" : "none";
+
+  if (mode === "workflows") {
+    setTimeout(drawConnections, 60);
+  }
+};
+
+// Quick Prompt Chips
 window.applyQuickPrompt = function(promptText) {
   const input = document.getElementById("prompt-input");
   if (input) {
@@ -132,96 +224,88 @@ window.applyQuickPrompt = function(promptText) {
   }
 };
 
-// AI Prompt-to-Workflow Synthesizer Engine
+// AI Workflow Synthesizer
 window.synthesizeWorkflowFromPrompt = function(prompt) {
   const submitBtn = document.getElementById("prompt-submit-btn");
   if (submitBtn) {
     submitBtn.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-      <span>Synthesizing Pipeline...</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      <span>Synthesizing...</span>
     `;
     submitBtn.disabled = true;
   }
 
-  // Add synthesis console log
-  logConsole("SYNTHESIZER", `Analyzing natural language prompt: "${prompt}"`, "info");
-  logConsole("PARSER", "Decomposing into Triggers, Data Ingestion, AI Reasoning, and Delivery Actions...", "warn");
+  logConsole("SYNTHESIZER", `Parsing prompt: "${prompt}"`, "info");
 
   setTimeout(() => {
-    // Generate specialized workflow topology based on keywords
     const synthesized = generateNodesFromPrompt(prompt);
     currentWorkflow = synthesized;
     renderCanvas(currentWorkflow);
 
-    logConsole("ORCHESTRATOR", `Synthesized ${synthesized.nodes.length}-node pipeline successfully! Ready for execution.`, "success");
+    logConsole("ORCHESTRATOR", `Synthesized ${synthesized.nodes.length}-node pipeline ready.`, "success");
 
     if (submitBtn) {
       submitBtn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         <span>Synthesize Pipeline</span>
       `;
       submitBtn.disabled = false;
     }
 
-    // Auto-run simulation to show instant live preview
     simulateWorkflowRun();
-  }, 1200);
+  }, 1000);
 };
 
-// Heuristic Pipeline Synthesizer
+// Heuristic Generator
 function generateNodesFromPrompt(prompt) {
   const p = prompt.toLowerCase();
   const nodes = [];
   let domain = "Custom AI";
 
-  // Trigger Node
-  if (p.includes("schedule") || p.includes("hour") || p.includes("daily") || p.includes("cron")) {
-    nodes.push({ id: "n1", type: "trigger", title: "Cron Schedule Trigger", service: "Cron Scheduler", badge: "Trigger" });
-  } else if (p.includes("stripe") || p.includes("payment") || p.includes("webhook")) {
-    nodes.push({ id: "n1", type: "trigger", title: "Payment Webhook Received", service: "Stripe Webhook API", badge: "Trigger" });
-    domain = "Fintech & Billing";
-  } else if (p.includes("youtube") || p.includes("video")) {
-    nodes.push({ id: "n1", type: "trigger", title: "New Media Ingested", service: "YouTube RSS / Webhook", badge: "Trigger" });
-    domain = "Media & Content";
-  } else if (p.includes("github") || p.includes("commit") || p.includes("issue")) {
+  // Trigger
+  if (p.includes("schedule") || p.includes("cron") || p.includes("hour") || p.includes("daily")) {
+    nodes.push({ id: "n1", type: "trigger", title: "Cron Timer Trigger", service: "Schedule Engine", badge: "Trigger" });
+  } else if (p.includes("stripe") || p.includes("payment")) {
+    nodes.push({ id: "n1", type: "trigger", title: "Stripe Webhook Event", service: "Stripe API", badge: "Trigger" });
+    domain = "Fintech";
+  } else if (p.includes("video") || p.includes("youtube")) {
+    nodes.push({ id: "n1", type: "trigger", title: "Video Stream Ingestion", service: "YouTube RSS / Webhook", badge: "Trigger" });
+    domain = "Media & Video";
+  } else if (p.includes("github") || p.includes("pr") || p.includes("issue")) {
     nodes.push({ id: "n1", type: "trigger", title: "GitHub Event Webhook", service: "GitHub REST API", badge: "Trigger" });
     domain = "DevOps";
   } else {
-    nodes.push({ id: "n1", type: "trigger", title: "HTTP Request Trigger", service: "Omni Inbound Webhook", badge: "Trigger" });
+    nodes.push({ id: "n1", type: "trigger", title: "HTTP Request Inbound", service: "Omni Webhook Trigger", badge: "Trigger" });
   }
 
-  // Data Gathering / Action Node
+  // Action / Data
   if (p.includes("scrape") || p.includes("crawl") || p.includes("monitor")) {
-    nodes.push({ id: "n2", type: "action", title: "Headless Browser Scraper", service: "Playwright Web Crawler", badge: "Extraction" });
+    nodes.push({ id: "n2", type: "action", title: "Headless Browser Scrape", service: "Playwright Engine", badge: "Data Ingestion" });
   } else if (p.includes("transcribe") || p.includes("audio")) {
-    nodes.push({ id: "n2", type: "action", title: "Audio Transcription", service: "Whisper Speech Engine", badge: "Extraction" });
-  } else if (p.includes("database") || p.includes("sql") || p.includes("enrich")) {
-    nodes.push({ id: "n2", type: "action", title: "Data Enrichment Query", service: "Supabase / Apollo API", badge: "Enrichment" });
+    nodes.push({ id: "n2", type: "action", title: "Whisper Audio Transcribe", service: "Whisper Large v3", badge: "Speech AI" });
   } else {
-    nodes.push({ id: "n2", type: "action", title: "Payload Sanitizer & Schema", service: "JSON Transform", badge: "Validation" });
+    nodes.push({ id: "n2", type: "action", title: "Payload Normalizer", service: "Data Transformer", badge: "Extraction" });
   }
 
-  // AI Reasoning Node
+  // LLM Reasoning
   if (p.includes("claude")) {
-    nodes.push({ id: "n3", type: "ai", title: "Complex Clause Analysis", service: "Claude 3.5 Sonnet", badge: "AI Reasoning" });
+    nodes.push({ id: "n3", type: "ai", title: "Complex Reasoning Agent", service: "Claude 3.5 Sonnet", badge: "AI Agent" });
   } else if (p.includes("gemini")) {
-    nodes.push({ id: "n3", type: "ai", title: "Long-Context Synthesis", service: "Google Gemini 1.5 Pro", badge: "AI Reasoning" });
+    nodes.push({ id: "n3", type: "ai", title: "Long-Context Synthesis", service: "Gemini 1.5 Pro", badge: "AI Agent" });
   } else {
-    nodes.push({ id: "n3", type: "ai", title: "Multimodal Synthesis Agent", service: "GPT-4o Deep Engine", badge: "AI Reasoning" });
+    nodes.push({ id: "n3", type: "ai", title: "Multimodal Synthesis Agent", service: "GPT-4o Agent Engine", badge: "AI Agent" });
   }
 
-  // Conditional Logic Gate
-  nodes.push({ id: "n4", type: "action", title: "Validation & Confidence Gate", service: "Conditional Logic", badge: "Filter / Gate" });
+  // Condition Gate
+  nodes.push({ id: "n4", type: "action", title: "Confidence & Gate Validation", service: "Logic Gate", badge: "Gate" });
 
-  // Output Node
+  // Output
   if (p.includes("telegram")) {
     nodes.push({ id: "n5", type: "output", title: "Telegram Channel Alert", service: "Telegram Bot API", badge: "Delivery" });
   } else if (p.includes("slack")) {
-    nodes.push({ id: "n5", type: "output", title: "Incident Alert Dispatch", service: "Slack Incoming Webhook", badge: "Delivery" });
-  } else if (p.includes("email") || p.includes("newsletter")) {
-    nodes.push({ id: "n5", type: "output", title: "Automated Email Delivery", service: "Resend / SendGrid", badge: "Delivery" });
+    nodes.push({ id: "n5", type: "output", title: "Slack Incident Dispatch", service: "Slack Webhook", badge: "Delivery" });
   } else {
-    nodes.push({ id: "n5", type: "output", title: "Multi-Endpoint Webhook", service: "REST POST / DB Store", badge: "Delivery" });
+    nodes.push({ id: "n5", type: "output", title: "Multi-Platform Output", service: "REST / Webhook / DB", badge: "Delivery" });
   }
 
   return {
@@ -229,13 +313,13 @@ function generateNodesFromPrompt(prompt) {
     title: prompt.length > 50 ? prompt.substring(0, 47) + "..." : prompt,
     domain: domain,
     stepsCount: nodes.length,
-    description: `Synthesized on-demand from prompt: "${prompt}". Autonomous orchestration with automated schema validation and live connector endpoints.`,
-    tags: ["Custom AI", "Automated", domain],
+    description: `Synthesized on-demand from prompt: "${prompt}". Autonomous orchestration with animated laser data telemetry.`,
+    tags: ["Custom AI", "Real-Time", domain],
     nodes: nodes
   };
 }
 
-// Render Canvas Nodes & Connecting SVG Curves
+// Render Canvas Nodes
 function renderCanvas(workflow) {
   const container = document.getElementById("pipeline-nodes-mount");
   const svg = document.getElementById("svg-connections");
@@ -252,29 +336,32 @@ function renderCanvas(workflow) {
 
   workflow.nodes.forEach((node, index) => {
     const nodeEl = document.createElement("div");
-    nodeEl.className = `wf-node type-${node.type}`;
+    nodeEl.className = "wf-node";
     nodeEl.id = `node-view-${index}`;
     nodeEl.innerHTML = `
       <div class="node-port input"></div>
       <div class="node-header">
         <span class="node-type-badge">${node.badge}</span>
-        <span style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">#${index + 1}</span>
+        <span style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">0${index + 1}</span>
       </div>
       <div class="node-title">${escapeHtml(node.title)}</div>
       <div class="node-service">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
         ${escapeHtml(node.service)}
       </div>
+      <div class="node-state-pill" id="node-state-${index}">
+        <span>State</span>
+        <span style="color: var(--text-muted);">STANDBY</span>
+      </div>
       <div class="node-port output"></div>
     `;
     container.appendChild(nodeEl);
   });
 
-  // Draw connecting bezier cables between nodes
-  setTimeout(drawConnections, 50);
+  setTimeout(drawConnections, 60);
 }
 
-// Draw Bezier Curves Between Canvas Nodes
+// Draw Connecting SVG Cables With Traveling Pulse Packet
 function drawConnections() {
   const svg = document.getElementById("svg-connections");
   const container = document.getElementById("pipeline-nodes-mount");
@@ -298,54 +385,102 @@ function drawConnections() {
     const deltaX = (endX - startX) / 2;
     const pathD = `M ${startX} ${startY} C ${startX + deltaX} ${startY}, ${endX - deltaX} ${endY}, ${endX} ${endY}`;
 
+    // Base Cable Path
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", pathD);
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke", "rgba(56, 189, 248, 0.45)");
-    path.setAttribute("stroke-width", "3");
-    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("class", "pipeline-cable");
     path.id = `cable-${i}`;
-
     svg.appendChild(path);
+
+    // Traveling Data Packet Particle
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("r", "3.5");
+    circle.setAttribute("fill", "#ffffff");
+    circle.setAttribute("id", `packet-${i}`);
+
+    const animMotion = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+    animMotion.setAttribute("path", pathD);
+    animMotion.setAttribute("dur", "2.2s");
+    animMotion.setAttribute("repeatCount", "indefinite");
+    animMotion.setAttribute("begin", `${i * 0.45}s`);
+    circle.appendChild(animMotion);
+
+    svg.appendChild(circle);
   }
 }
 
-// Window resize updates connecting curves
 window.addEventListener("resize", drawConnections);
 
-// Simulate Workflow Execution
+// Pipeline Runner Simulation (Visual Step-by-Step Telemetry)
 window.simulateWorkflowRun = function() {
   if (isSimulating) return;
   isSimulating = true;
 
   const runBtn = document.getElementById("run-sim-btn");
+  const statusIndicator = document.getElementById("pipeline-status-text");
+
   if (runBtn) {
     runBtn.disabled = true;
     runBtn.innerHTML = `
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-      <span>Executing Pipeline...</span>
+      <span>Tracing Telemetry...</span>
     `;
   }
 
-  logConsole("DISPATCHER", `Triggering execution run for [${currentWorkflow.title}]`, "info");
+  logConsole("RUNNER", `Executing pipeline: [${currentWorkflow.title}]`, "info");
 
   const nodes = document.querySelectorAll(".wf-node");
   let step = 0;
 
   function runNextStep() {
     if (step < nodes.length) {
-      nodes.forEach(n => n.classList.remove("active"));
-      nodes[step].classList.add("active");
+      // Deactivate previous
+      nodes.forEach(n => n.classList.remove("executing"));
+
+      // Activate current node
+      const currentNode = nodes[step];
+      currentNode.classList.add("executing");
 
       const nodeData = currentWorkflow.nodes[step];
-      const latency = Math.floor(Math.random() * 120 + 35);
-      logConsole(nodeData.badge.toUpperCase(), `[Node ${step + 1}: ${nodeData.title}] executed via ${nodeData.service} (${latency}ms) - Status: 200 OK`, "success");
+      const statePill = document.getElementById(`node-state-${step}`);
+      if (statePill) {
+        statePill.innerHTML = `<span>State</span><span style="color:#ffffff; font-weight:700;">EXECUTING</span>`;
+      }
 
-      step++;
-      setTimeout(runNextStep, 450);
+      // Activate corresponding cable
+      if (step > 0) {
+        const prevCable = document.getElementById(`cable-${step - 1}`);
+        if (prevCable) prevCable.classList.add("active-stream");
+      }
+
+      if (statusIndicator) {
+        statusIndicator.textContent = `Processing Step ${step + 1}/${nodes.length}: ${nodeData.title}...`;
+      }
+
+      const latency = Math.floor(Math.random() * 80 + 30);
+      logConsole(nodeData.badge.toUpperCase(), `[Node ${step + 1}: ${nodeData.title}] -> OK (${latency}ms)`, "success");
+
+      setTimeout(() => {
+        currentNode.classList.remove("executing");
+        currentNode.classList.add("completed");
+        if (statePill) {
+          statePill.innerHTML = `<span>State</span><span style="color:#a3a3a3;">COMPLETED ✓</span>`;
+        }
+
+        step++;
+        runNextStep();
+      }, 750);
+
     } else {
-      nodes.forEach(n => n.classList.remove("active"));
-      logConsole("PIPELINE", "Workflow completed 100% successfully. Output payload validated and synced.", "success");
+      // Completed all steps
+      if (statusIndicator) statusIndicator.textContent = "Pipeline execution complete (100% verified)";
+      logConsole("PIPELINE", "All nodes returned 200 OK. Output payload synthesized & ready.", "success");
+
+      // Reset cables after 1.5s
+      setTimeout(() => {
+        document.querySelectorAll(".pipeline-cable").forEach(c => c.classList.remove("active-stream"));
+      }, 1500);
+
       isSimulating = false;
       if (runBtn) {
         runBtn.disabled = false;
@@ -360,7 +495,7 @@ window.simulateWorkflowRun = function() {
   runNextStep();
 };
 
-// Console Logging Utility
+// Console Logger
 function logConsole(source, msg, type = "info") {
   const consoleEl = document.getElementById("console-logs-mount");
   if (!consoleEl) return;
@@ -371,15 +506,15 @@ function logConsole(source, msg, type = "info") {
   const time = new Date().toISOString().substring(11, 19);
   line.innerHTML = `
     <span class="log-time">[${time}]</span>
-    <span class="log-${type}">[${escapeHtml(source)}]</span>
-    <span style="color: #cbd5e1;">${escapeHtml(msg)}</span>
+    <span class="log-source">[${escapeHtml(source)}]</span>
+    <span class="log-msg ${type === 'success' ? 'success' : ''}">${escapeHtml(msg)}</span>
   `;
 
   consoleEl.appendChild(line);
   consoleEl.scrollTop = consoleEl.scrollHeight;
 }
 
-// Render Pre-Built Catalog Cards
+// Render Catalog Cards
 function renderCatalog(workflows) {
   const grid = document.getElementById("catalog-grid-mount");
   if (!grid) return;
@@ -401,10 +536,10 @@ function renderCatalog(workflows) {
       <div class="wf-card-actions">
         <button type="button" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="loadWorkflowIntoCanvas('${wf.id}')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          <span>Load &amp; Run</span>
+          <span>Load Pipeline</span>
         </button>
         <button type="button" class="btn-secondary" style="padding: 0.5rem 0.85rem; font-size: 0.8rem;" onclick="openExportModal('${wf.id}')">
-          <span>Export Blueprint</span>
+          <span>Export Code</span>
         </button>
       </div>
     `;
@@ -412,34 +547,219 @@ function renderCatalog(workflows) {
   });
 }
 
-// Filter Catalog Tabs
+// Filter Catalog
 window.filterCatalog = function(domain, btn) {
-  const btns = document.querySelectorAll(".cat-tab-btn");
-  btns.forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".cat-tab-btn").forEach(b => b.classList.remove("active"));
   if (btn) btn.classList.add("active");
 
   if (domain === "all") {
     renderCatalog(PRESET_WORKFLOWS);
   } else {
-    const filtered = PRESET_WORKFLOWS.filter(wf => wf.domain.toLowerCase().includes(domain.toLowerCase()));
-    renderCatalog(filtered);
+    renderCatalog(PRESET_WORKFLOWS.filter(w => w.domain.toLowerCase().includes(domain.toLowerCase())));
   }
 };
 
-// Load Selected Workflow into Canvas
+// Load Workflow into Canvas
 window.loadWorkflowIntoCanvas = function(workflowId) {
   const wf = PRESET_WORKFLOWS.find(w => w.id === workflowId);
   if (wf) {
     currentWorkflow = wf;
     renderCanvas(currentWorkflow);
-    logConsole("LOADER", `Loaded pre-built workflow blueprint: [${wf.title}]`, "info");
+    logConsole("LOADER", `Loaded blueprint: [${wf.title}]`, "info");
     const studio = document.getElementById("studio");
     if (studio) studio.scrollIntoView({ behavior: "smooth" });
     simulateWorkflowRun();
   }
 };
 
-// Open Export Blueprint Modal
+/* ==========================================================================
+   MULTIMODAL PROMPT REPLICATOR ENGINE (VIDEO / IMAGE / TEXT TO PROMPT)
+   ========================================================================== */
+
+let mmActiveTab = "video"; // 'video' | 'image' | 'agent'
+
+window.switchMmTab = function(tab, btn) {
+  mmActiveTab = tab;
+  document.querySelectorAll(".mm-tab-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+
+  const titleEl = document.getElementById("mm-input-title");
+  const placeholderEl = document.getElementById("mm-input-text");
+  const targetBadge = document.getElementById("mm-target-badge");
+
+  if (tab === "video") {
+    if (titleEl) titleEl.textContent = "Video Input & Scene Deconstruction";
+    if (placeholderEl) placeholderEl.placeholder = "Paste YouTube/TikTok URL or describe a video scene (e.g. Drone gliding through cyberpunk Tokyo in the rain, neon reflections, anamorphic camera lens)...";
+    if (targetBadge) targetBadge.textContent = "Target: Sora / Runway Gen-3 / Kling";
+  } else if (tab === "image") {
+    if (titleEl) titleEl.textContent = "Image Input & Visual Style Extraction";
+    if (placeholderEl) placeholderEl.placeholder = "Paste image URL or describe visual composition (e.g. Vintage portrait of a watchmaker in a dusty workshop with brass gears and soft tungsten lighting)...";
+    if (targetBadge) targetBadge.textContent = "Target: Midjourney v6.1 / Flux.1 Pro";
+  } else {
+    if (titleEl) titleEl.textContent = "Agent Goal & Operational Objective";
+    if (placeholderEl) placeholderEl.placeholder = "Describe what you want the AI agent to achieve (e.g. Build an autonomous code reviewer that checks PR diffs for SQL injections and performance bottlenecks)...";
+    if (targetBadge) targetBadge.textContent = "Target: Claude 3.5 Sonnet / Cursor / GPT-4o";
+  }
+};
+
+window.reverseEngineerPrompt = function() {
+  const input = document.getElementById("mm-input-text");
+  const outputBox = document.getElementById("mm-output-result");
+  const btn = document.getElementById("mm-generate-btn");
+  const query = input ? input.value.trim() : "";
+
+  if (!query) {
+    if (outputBox) outputBox.textContent = "// Please enter a description, URL, or goal above to extract the exact master prompt.";
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Synthesizing Exact Prompt...`;
+  }
+
+  setTimeout(() => {
+    let result = "";
+
+    if (mmActiveTab === "video") {
+      result = `// ===============================================================
+// EXACT EXTRACTED VIDEO GENERATION PROMPT (Sora / Runway Gen-3 / Kling)
+// Copy and paste directly into your video generator for identical output:
+// ===============================================================
+
+${query.includes("drone") || query.includes("camera") ? query : "A high-fidelity cinematic scene: " + query}
+
+[CAMERA MOTION]: 35mm anamorphic prime lens, continuous fluid dolly tracking shot, subtle organic camera shake, 60fps slow-motion capture.
+[LIGHTING & COLOR]: Dramatic volumetric illumination, ray-traced ambient occlusion, soft rim lighting, natural specular highlights.
+[PHYSICS & TEXTURE]: Micro-droplet particle physics, hyper-realistic motion cadence, zero temporal jitter or frame warping.
+[TECHNICAL SPECS]: 4K UHD, 16:9 widescreen, Photorealistic render pass, high dynamic range (HDR10).`;
+
+    } else if (mmActiveTab === "image") {
+      result = `// ===============================================================
+// EXACT EXTRACTED IMAGE GENERATION PROMPT (Midjourney v6.1 / Flux.1)
+// Copy and paste directly into Midjourney or Flux:
+// ===============================================================
+
+${query}, shot on Hasselblad H6D-100c, 85mm f/1.4 prime lens, editorial depth of field, dramatic chiaroscuro studio lighting, subsurface scattering, tactile material texture, rich tonal gradients, fine grain details, octane render pass, cinematic composition --ar 16:9 --style raw --v 6.1 --s 250
+
+[NEGATIVE PROMPTS TO AVOID]:
+blurry, low quality, oversaturated, deformed anatomy, plastic skin, watermark, text artifacts, extra limbs.`;
+
+    } else {
+      result = `// ===============================================================
+// EXACT AUTONOMOUS AGENT SYSTEM PROMPT (Claude 3.5 / Cursor / GPT-4o)
+// Copy and paste directly into your AI Agent System Prompt or Cursor Rules:
+// ===============================================================
+
+You are an expert Autonomous Engineering Agent engineered for:
+"${query}"
+
+## CORE MANDATE & EXECUTION LOOP:
+1. Parse the user's specific context and extract all deterministic constraints before performing actions.
+2. Execute step-by-step chain-of-thought verification in your internal scratchpad.
+3. Validate all inputs against security thresholds and operational requirements.
+
+## RESPONSE FORMAT:
+Always return structured, actionable output with zero filler conversation:
+{
+  "status": "SUCCESS | REVIEW_NEEDED",
+  "objective": "${query.substring(0, 40)}...",
+  "execution_steps": [
+    { "step": 1, "action": "Verification", "details": "..." },
+    { "step": 2, "action": "Execution", "code_or_payload": "..." }
+  ],
+  "verified": true
+}`;
+    }
+
+    if (outputBox) outputBox.textContent = result;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> <span>Generate Exact Prompt</span>`;
+    }
+  }, 900);
+};
+
+// Copy Multimodal Output
+window.copyMmPrompt = function() {
+  const box = document.getElementById("mm-output-result");
+  const btn = document.getElementById("mm-copy-btn");
+  if (box && box.textContent) {
+    navigator.clipboard.writeText(box.textContent).then(() => {
+      if (btn) {
+        btn.textContent = "✓ Copied to Clipboard!";
+        setTimeout(() => { btn.textContent = "Copy Prompt"; }, 2000);
+      }
+    });
+  }
+};
+
+/* ==========================================================================
+   PRE-DATA CURATED PROMPT BANK
+   ========================================================================== */
+
+function renderPromptBank(prompts) {
+  const grid = document.getElementById("prompts-bank-mount");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  prompts.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "prompt-card";
+    card.innerHTML = `
+      <div class="prompt-card-header">
+        <span class="prompt-type-pill">${escapeHtml(p.type)} prompt</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(p.target)}</span>
+      </div>
+      <h3 class="prompt-card-title">${escapeHtml(p.title)}</h3>
+      <div class="prompt-snippet">${escapeHtml(p.promptText)}</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">
+        <strong>Parameters:</strong> ${escapeHtml(p.parameters)}
+      </div>
+      <div style="display: flex; gap: 0.5rem; margin-top: auto;">
+        <button type="button" class="btn-primary" style="padding: 0.45rem 0.9rem; font-size: 0.8rem; flex: 1;" onclick="copySinglePrompt('${p.id}', this)">
+          Copy Master Prompt
+        </button>
+        <button type="button" class="btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" onclick="loadPromptIntoExtractor('${p.id}')">
+          Edit
+        </button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.copySinglePrompt = function(id, btn) {
+  const promptObj = PRESET_PROMPTS_BANK.find(p => p.id === id);
+  if (promptObj) {
+    navigator.clipboard.writeText(promptObj.promptText).then(() => {
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = "✓ Copied!";
+        setTimeout(() => { btn.textContent = orig; }, 1800);
+      }
+    });
+  }
+};
+
+window.loadPromptIntoExtractor = function(id) {
+  const promptObj = PRESET_PROMPTS_BANK.find(p => p.id === id);
+  if (promptObj) {
+    const mmTabBtn = document.querySelector(`.mm-tab-btn[data-tab="${promptObj.type === 'agent' ? 'agent' : promptObj.type}"]`);
+    switchMainMode('multimodal', document.querySelectorAll('.mode-tab-btn')[1]);
+    if (mmTabBtn) switchMmTab(promptObj.type === 'agent' ? 'agent' : promptObj.type, mmTabBtn);
+
+    const input = document.getElementById("mm-input-text");
+    if (input) input.value = promptObj.promptText;
+
+    const outputBox = document.getElementById("mm-output-result");
+    if (outputBox) outputBox.textContent = promptObj.promptText;
+
+    document.getElementById("multimodal-view").scrollIntoView({ behavior: "smooth" });
+  }
+};
+
+// Export Modal
 window.openExportModal = function(workflowId) {
   const wf = PRESET_WORKFLOWS.find(w => w.id === workflowId) || currentWorkflow;
   const modal = document.getElementById("export-modal");
@@ -449,8 +769,8 @@ window.openExportModal = function(workflowId) {
   if (modalTitle) modalTitle.textContent = `Export Blueprint: ${wf.title}`;
 
   const blueprint = {
-    schema_version: "2026.1",
-    generator: "Omni AI Workflows (omni.winplaybox.in)",
+    schema_version: "2026.2-monochrome",
+    platform: "Omni AI Workflows (omni.winplaybox.in)",
     workflow_id: wf.id,
     title: wf.title,
     domain: wf.domain,
@@ -460,11 +780,7 @@ window.openExportModal = function(workflowId) {
       name: n.title,
       type: n.type,
       service: n.service,
-      parameters: {
-        auto_retry: true,
-        timeout_ms: 5000,
-        concurrency: 1
-      }
+      parameters: { auto_retry: true, timeout_ms: 5000 }
     })),
     n8n_compatible: true,
     zapier_cli_ready: true,
@@ -475,13 +791,11 @@ window.openExportModal = function(workflowId) {
   if (modal) modal.classList.add("open");
 };
 
-// Close Modal
 window.closeExportModal = function() {
   const modal = document.getElementById("export-modal");
   if (modal) modal.classList.remove("open");
 };
 
-// Copy Export Code
 window.copyExportCode = function() {
   const codeBox = document.getElementById("export-code-box");
   const copyBtn = document.getElementById("copy-code-btn");
@@ -495,7 +809,6 @@ window.copyExportCode = function() {
   }
 };
 
-// String Escaping Utility
 function escapeHtml(str) {
   if (!str) return "";
   return String(str)
