@@ -2,10 +2,14 @@
   "name": "omni-ai-workflows",
   "version": "1.0.0",
   "description": "Omni AI Workflows - Autonomous Prompt-to-Workflow Platform & Daily AI Blueprint Engine (omni.winplaybox.in)",
-  "main": "index.html",
+  "main": "server.js",
   "scripts": {
-    "start": "npx serve . -l 3000",
+    "start": "node server.js",
+    "build": "echo 'Omni AI Workflows build complete'",
     "generate-workflow": "node scripts/dailyWorkflowPoster.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
   },
   "keywords": [
     "ai-workflows",
