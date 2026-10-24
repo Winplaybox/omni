@@ -83,16 +83,46 @@ const PRESET_WORKFLOWS = [
   {
     id: "lead-enrichment-apollo",
     title: "B2B Lead Enrichment & Automated Outreach Sequence",
-    domain: "Sales & Marketing",
+    domain: "Productivity",
     stepsCount: 5,
     description: "Captures signups from landing page, enriches company revenue and funding status via Apollo & Clearbit, personalizes cold outreach email, and queues into HubSpot.",
-    tags: ["Clearbit", "Apollo.io", "HubSpot", "Resend Email"],
+    tags: ["Clearbit", "Apollo.io", "HubSpot", "Resend Email", "Productivity"],
     nodes: [
       { id: "n1", type: "trigger", title: "Landing Page Lead Form", service: "Stripe / Web Form", badge: "Trigger" },
       { id: "n2", type: "action", title: "Domain & Firmographics", service: "Apollo.io API", badge: "Enrichment" },
       { id: "n3", type: "ai", title: "Hyper-Personalized Pitch", service: "OpenAI GPT-4o", badge: "AI Reasoning" },
       { id: "n4", type: "action", title: "Sync Customer Record", service: "HubSpot CRM", badge: "Database" },
       { id: "n5", type: "output", title: "Direct Outreach Dispatch", service: "Resend / SendGrid", badge: "Email Delivery" }
+    ]
+  },
+  {
+    id: "shopify-inventory-sync",
+    title: "Omnichannel E-Commerce Inventory & Restock Automator",
+    domain: "E-Commerce",
+    stepsCount: 5,
+    description: "Real-time webhook sync across Shopify, Amazon FBA, and WooCommerce. Predicts stock-out dates with time-series forecasting and auto-drafts supplier purchase orders.",
+    tags: ["Shopify Webhooks", "Amazon FBA", "Inventory Sync", "E-Commerce", "Automation"],
+    nodes: [
+      { id: "n1", type: "trigger", title: "Order Placed Webhook", service: "Shopify Store API", badge: "Trigger" },
+      { id: "n2", type: "action", title: "Stock Ledger Sync", service: "PostgreSQL Database", badge: "Data Store" },
+      { id: "n3", type: "ai", title: "Depletion Velocity Forecaster", service: "Predictive Analytics Agent", badge: "Forecasting" },
+      { id: "n4", type: "action", title: "Supplier PO Generation", service: "PDF / ERP Generator", badge: "Accounting" },
+      { id: "n5", type: "output", title: "Vendor Dispatch & Slack Alert", service: "SMTP & Slack Webhook", badge: "Dispatch" }
+    ]
+  },
+  {
+    id: "k8s-incident-postmortem",
+    title: "Kubernetes Auto-Incident Triage & Postmortem Writer",
+    domain: "Developer Tools",
+    stepsCount: 5,
+    description: "Detects Datadog/Prometheus CrashLoopBackOff alerts, aggregates last 500 lines of Pod logs, generates root-cause RCA, and posts Notion incident postmortem page.",
+    tags: ["Kubernetes", "Datadog", "Prometheus", "Notion API", "Developer Tools"],
+    nodes: [
+      { id: "n1", type: "trigger", title: "Prometheus Alertmanager", service: "Webhook Trigger", badge: "Trigger" },
+      { id: "n2", type: "action", title: "Cluster Log Extraction", service: "kubectl / Loki API", badge: "Log Ingestion" },
+      { id: "n3", type: "ai", title: "Root Cause RCA Investigator", service: "Claude 3.5 Sonnet", badge: "AI Agent" },
+      { id: "n4", type: "action", title: "Incident Runbook Execution", service: "Argo Workflows", badge: "Remediation" },
+      { id: "n5", type: "output", title: "Notion Postmortem Document", service: "Notion API & Slack", badge: "Documentation" }
     ]
   }
 ];
@@ -164,6 +194,35 @@ Given any competitor domain or URL:
     target: "Flux.1 / Midjourney",
     promptText: "Clean, ultra-minimalist dark mode analytics SaaS dashboard interface on MacBook Pro M3 display, glowing cyan and violet line graphs, glassmorphic floating cards, crisp typography, Figma UI design showcase, Behance trending UI/UX, isometric perspective, high-tech dark studio background --ar 16:9 --style raw",
     parameters: "--ar 16:9 --v 6.1"
+  },
+  {
+    id: "p7",
+    type: "video",
+    title: "Hypercar Aerodynamic Wind Tunnel Aerodynamics Visualization",
+    target: "Runway Gen-3 / Sora",
+    promptText: "Dramatic wind tunnel test of a matte-black electric hypercar prototype. Glowing white neon streamlines flow across sculpted carbon-fiber aerodynamics, vortex currents swirling off the rear diffuser. Low-angle tracking shot, cinematic studio lighting with deep obsidian shadows, 4k 60fps photorealism, industrial design precision.",
+    parameters: "Aspect Ratio: 16:9 | Camera: Low Dolly Track | Physics: CFD Particle Simulation"
+  },
+  {
+    id: "p8",
+    type: "image",
+    title: "Monolithic Brutalist Concrete Villa Overlooking Misty Ocean",
+    target: "Flux.1 Pro / Midjourney v6.1",
+    promptText: "Monumental brutalist architectural residence constructed from board-formed raw concrete cantilevered over a stormy cliffside ocean in Norway. Massive floor-to-ceiling glass windows showing warm amber interior light against overcast Nordic twilight. Waves crashing on black volcanic rocks below, Architectural Digest photography, tilt-shift lens, pristine composition --ar 16:9 --style raw",
+    parameters: "--ar 16:9 --style raw --v 6.1 --chaos 10"
+  },
+  {
+    id: "p9",
+    type: "agent",
+    title: "Zero-Downtime Database Migration & Schema Sharding Architect",
+    target: "Claude 3.5 Sonnet / GPT-4o",
+    promptText: `You are a Principal Database Reliability Engineer specializing in high-concurrency systems.
+Given a legacy relational schema and target traffic profile:
+1. Formulate a blue-green zero-downtime dual-write migration strategy.
+2. Generate idempotent forward and rollback SQL migrations with backfill throttling.
+3. Define conflict resolution strategies for concurrent row updates.
+4. Provide the monitoring queries to track replication lag and lock contention in real time.`,
+    parameters: "Role: Database Reliability Principal | Strategy: Expand & Contract Dual-Write"
   }
 ];
 
@@ -174,10 +233,35 @@ let activeMode = "workflows"; // 'workflows' | 'multimodal' | 'predata'
 
 // DOM Initialization
 document.addEventListener("DOMContentLoaded", () => {
-  renderCanvas(currentWorkflow);
-  renderCatalog(PRESET_WORKFLOWS);
-  renderPromptBank(PRESET_PROMPTS_BANK);
-  setupEventListeners();
+  try {
+    if (typeof renderCanvas === "function") {
+      renderCanvas(currentWorkflow);
+    }
+  } catch (err) {
+    console.error("Error initializing canvas:", err);
+  }
+
+  try {
+    if (typeof renderCatalog === "function") {
+      renderCatalog(PRESET_WORKFLOWS);
+    }
+  } catch (err) {
+    console.error("Error initializing catalog:", err);
+  }
+
+  try {
+    if (typeof renderPromptBank === "function") {
+      renderPromptBank(PRESET_PROMPTS_BANK);
+    }
+  } catch (err) {
+    console.error("Error initializing prompt bank:", err);
+  }
+
+  try {
+    setupEventListeners();
+  } catch (err) {
+    console.error("Error setting up event listeners:", err);
+  }
 });
 
 // Setup Event Handlers
@@ -575,6 +659,93 @@ function logConsole(source, msg, type = "info") {
   consoleEl.appendChild(line);
   consoleEl.scrollTop = consoleEl.scrollHeight;
 }
+
+/* ==========================================================================
+   PRE-BUILT ENTERPRISE WORKFLOWS CATALOG ENGINE
+   ========================================================================== */
+
+function renderCatalog(workflows) {
+  const mount = document.getElementById("catalog-grid-mount");
+  if (!mount) return;
+
+  mount.innerHTML = "";
+
+  if (!workflows || workflows.length === 0) {
+    mount.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--text-muted); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md);">
+        <p style="font-size: 1rem; margin-bottom: 0.75rem; color: #ffffff; font-weight: 600;">No blueprints match this category</p>
+        <button type="button" class="btn-secondary" style="font-size: 0.82rem; padding: 0.45rem 0.9rem;" onclick="filterCatalog('all', document.querySelector('.cat-tab-btn'))">
+          View All Workflows
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  workflows.forEach(wf => {
+    const card = document.createElement("div");
+    card.className = "workflow-card";
+    card.id = `catalog-card-${wf.id}`;
+
+    const tagsHtml = (wf.tags || [])
+      .map(t => `<span class="wf-tech-tag">${escapeHtml(t)}</span>`)
+      .join("");
+
+    const stepsCount = wf.stepsCount || (wf.nodes ? wf.nodes.length : 0);
+
+    card.innerHTML = `
+      <div class="wf-card-header">
+        <span class="wf-card-domain">${escapeHtml(wf.domain)}</span>
+        <span class="wf-card-steps">${stepsCount} Steps</span>
+      </div>
+      <h3 class="wf-card-title">${escapeHtml(wf.title)}</h3>
+      <p class="wf-card-desc">${escapeHtml(wf.description)}</p>
+      <div class="wf-card-tags">
+        ${tagsHtml}
+      </div>
+      <div class="wf-card-actions">
+        <button type="button" class="btn-primary" style="padding: 0.55rem 1rem; font-size: 0.82rem; flex: 1;" onclick="loadWorkflowIntoCanvas('${wf.id}')">
+          Load Blueprint
+        </button>
+        <button type="button" class="btn-secondary" style="padding: 0.55rem 0.85rem; font-size: 0.82rem;" onclick="openExportModal('${wf.id}')" title="Export Blueprint JSON">
+          JSON
+        </button>
+      </div>
+    `;
+    mount.appendChild(card);
+  });
+}
+
+// Filter Catalog by Domain
+window.filterCatalog = function(domain, btn) {
+  document.querySelectorAll(".cat-tab-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+
+  if (!domain || domain === "all") {
+    renderCatalog(PRESET_WORKFLOWS);
+  } else {
+    const domLower = domain.toLowerCase();
+    const filtered = PRESET_WORKFLOWS.filter(w => {
+      const d = (w.domain || "").toLowerCase();
+      const tags = (w.tags || []).map(t => t.toLowerCase());
+      return d.includes(domLower) || tags.some(t => t.includes(domLower));
+    });
+    renderCatalog(filtered);
+  }
+};
+
+// Load Selected Workflow Blueprint into Visual Canvas
+window.loadWorkflowIntoCanvas = function(workflowId) {
+  const wf = PRESET_WORKFLOWS.find(w => w.id === workflowId);
+  if (wf) {
+    currentWorkflow = wf;
+    renderCanvas(currentWorkflow);
+    logConsole("BLUEPRINT", `Loaded pre-built workflow: "${wf.title}" (${wf.domain})`, "info");
+    const studio = document.getElementById("studio");
+    if (studio) studio.scrollIntoView({ behavior: "smooth" });
+    simulateWorkflowRun();
+  }
+};
 
 /* ==========================================================================
    MULTIMODAL PROMPT REPLICATOR ENGINE (FILE UPLOAD & REVERSE ENGINEERING)
@@ -1004,6 +1175,19 @@ function renderPromptBank(prompts) {
   if (!grid) return;
 
   grid.innerHTML = "";
+
+  if (!prompts || prompts.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--text-muted); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md);">
+        <p style="font-size: 1rem; margin-bottom: 0.75rem; color: #ffffff; font-weight: 600;">No master prompts match this filter</p>
+        <button type="button" class="btn-secondary" style="font-size: 0.82rem; padding: 0.45rem 0.9rem;" onclick="filterPromptBank('all', document.querySelector('.prompt-tab-btn'))">
+          View All Prompts
+        </button>
+      </div>
+    `;
+    return;
+  }
+
   prompts.forEach(p => {
     const card = document.createElement("div");
     card.className = "prompt-card";
@@ -1029,6 +1213,19 @@ function renderPromptBank(prompts) {
     grid.appendChild(card);
   });
 }
+
+// Filter Curated Prompt Bank by Type (all / video / image / agent)
+window.filterPromptBank = function(type, btn) {
+  document.querySelectorAll(".prompt-tab-btn").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+
+  if (!type || type === "all") {
+    renderPromptBank(PRESET_PROMPTS_BANK);
+  } else {
+    const filtered = PRESET_PROMPTS_BANK.filter(p => p.type === type);
+    renderPromptBank(filtered);
+  }
+};
 
 window.copySinglePrompt = function(id, btn) {
   const promptObj = PRESET_PROMPTS_BANK.find(p => p.id === id);
