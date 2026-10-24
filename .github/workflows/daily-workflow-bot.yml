@@ -1,0 +1,31 @@
+name: Omni Daily Automated Workflow Bot
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # Every day at 04:00 AM UTC
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  publish-daily-workflow:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Daily Workflow Synthesizer
+        run: node scripts/dailyWorkflowPoster.js
+
+      - name: Commit and Push Automated Post
+        run: |
+          git config --local user.email "bot@winplaybox.in"
+          git config --local user.name "Omni AI Workflow Engine"
+          git add blog.html
+          git commit -m "chore(automation): publish daily AI workflow blueprint [skip ci]" || exit 0
+          git push origin main
