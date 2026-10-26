@@ -1201,9 +1201,12 @@ function renderPromptBank(prompts) {
       <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">
         <strong>Parameters:</strong> ${escapeHtml(p.parameters)}
       </div>
-      <div style="display: flex; gap: 0.5rem; margin-top: auto;">
-        <button type="button" class="btn-primary" style="padding: 0.45rem 0.9rem; font-size: 0.8rem; flex: 1;" onclick="copySinglePrompt('${p.id}', this)">
-          Copy Master Prompt
+      <div style="display: flex; gap: 0.5rem; margin-top: auto; flex-wrap: wrap;">
+        <button type="button" class="btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; flex: 1; min-width: 140px;" onclick="copySinglePrompt('${p.id}', this)">
+          Copy Prompt
+        </button>
+        <button type="button" class="btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" onclick="openInGravityClaw('${p.id}')" title="Generate variations & multi-modules in GravityClaw">
+          GravityClaw ↗
         </button>
         <button type="button" class="btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" onclick="loadPromptIntoExtractor('${p.id}')">
           Edit
@@ -1237,6 +1240,18 @@ window.copySinglePrompt = function(id, btn) {
         setTimeout(() => { btn.textContent = orig; }, 1800);
       }
     });
+  }
+};
+
+window.openInGravityClaw = function(id) {
+  const promptObj = PRESET_PROMPTS_BANK.find(p => p.id === id);
+  if (promptObj) {
+    const url = new URL("https://gravityclaw.winplaybox.in/");
+    url.searchParams.set("prompt", promptObj.promptText);
+    url.searchParams.set("title", promptObj.title);
+    url.searchParams.set("category", promptObj.type || "agent");
+    url.searchParams.set("utm_source", "omni_workflows");
+    window.open(url.toString(), "_blank", "noopener");
   }
 };
 
