@@ -127,109 +127,9 @@ const PRESET_WORKFLOWS = [
   }
 ];
 
-// Pre-Data Curated Prompt Bank (Ready to Copy into Any AI Agent)
-const PRESET_PROMPTS_BANK = [
-  {
-    id: "p1",
-    type: "video",
-    title: "Cinematic Sci-Fi Tokyo Cyberpunk Drone Tracking Shot",
-    target: "Sora / Runway Gen-3 / Kling AI",
-    promptText: "A sweeping, high-altitude cinematic drone shot gliding smoothly through a neon-lit, rain-slicked Tokyo street in 2049. Realistic puddle reflections of holographic kanji billboards. An autonomous matte-black flying vehicle weaves between towering brutalist skyscrapers. Volumetric fog cutting through searchlights, anamorphic lens flare, 35mm film grain, 60fps slow-motion capture, hyper-realistic physics, zero motion blur, 8k resolution.",
-    parameters: "Aspect Ratio: 16:9 | Camera: FPV Drone Orbit | Lighting: Neon Rain Reflections | Engine: Runway Gen-3 Alpha"
-  },
-  {
-    id: "p2",
-    type: "image",
-    title: "Hyper-Realistic Medium Format Studio Portrait",
-    target: "Midjourney v6.1 / Flux.1 Pro",
-    promptText: "Intimate close-up studio portrait of an elderly watchmaker in his workshop, intricate brass watch gears and microscopic dials resting on his weathered fingers. Dramatic chiaroscuro lighting, soft dust motes illuminated by single tungsten lamp, Hasselblad H6D-100c, 100mm f/2.2 lens, shallow depth of field, tactile skin texture, subsurface scattering, authentic micro-details --ar 4:5 --style raw --v 6.1",
-    parameters: "--ar 4:5 --style raw --v 6.1 --s 250"
-  },
-  {
-    id: "p3",
-    type: "agent",
-    title: "Senior Full-Stack Code Reviewer & Architecture Agent",
-    target: "Claude 3.5 Sonnet / Cursor / GPT-4o",
-    promptText: `You are an elite Principal Software Engineer conducting strict code reviews.
-OBJECTIVE: Audit the user-supplied code diff for:
-1. Performance bottlenecks (O(n^2) operations, unnecessary re-renders, memory leaks).
-2. Security vulnerabilities (OWASP Top 10, SQLi, SSRF, XSS, insecure token storage).
-3. Production architectural clean code compliance.
-
-OUTPUT FORMAT:
-Respond exclusively with structured JSON:
-{
-  "summary": "Brief 2-sentence architectural verdict",
-  "critical_issues": [{ "line": 42, "category": "Security", "issue": "...", "fix_diff": "..." }],
-  "recommended_refactors": [{ "symbol": "fetchData", "reason": "...", "suggested_code": "..." }],
-  "approval_status": "APPROVED | CHANGES_REQUIRED"
-}`,
-    parameters: "Temperature: 0.1 | Role: Principal Software Engineer | Output: Strict JSON Schema"
-  },
-  {
-    id: "p4",
-    type: "video",
-    title: "Hyper-Dynamic Macro Action Product Commercial",
-    target: "Sora / Luma Dream Machine",
-    promptText: "Slow-motion macro shot of an iced espresso tonic beverage splashing inside a crystal cut glass. Crisp ice cubes collide in zero-gravity slow motion, droplets suspended in mid-air with refractive light caustics. Backlit with golden studio light, high-speed Phantom Flex 4K camera at 1000fps, crisp liquid physics, premium commercial advertisement aesthetic.",
-    parameters: "Frame Rate: 1000fps simulation | Lighting: Golden Hour Rim Caustics"
-  },
-  {
-    id: "p5",
-    type: "agent",
-    title: "Autonomous Competitor Reverse Engineering & SEO Agent",
-    target: "ChatGPT / Claude 3.5 / DeepSeek",
-    promptText: `You are an autonomous SEO intelligence strategist.
-Given any competitor domain or URL:
-1. Deconstruct their keyword cluster hierarchy and semantic content graph.
-2. Identify untapped programmatic search intent gaps where ranking difficulty is < 30.
-3. Formulate a 5-pillar editorial master plan with schema specifications (FAQPage, HowTo, Article).
-4. Provide the exact Markdown outline for an article designed to outrank the target URL.`,
-    parameters: "Role: Search Architect | Methodology: Semantic Entity Clustering"
-  },
-  {
-    id: "p6",
-    type: "image",
-    title: "Sleek Dark Mode Neumorphic Dashboard Interface",
-    target: "Flux.1 / Midjourney",
-    promptText: "Clean, ultra-minimalist dark mode analytics SaaS dashboard interface on MacBook Pro M3 display, glowing cyan and violet line graphs, glassmorphic floating cards, crisp typography, Figma UI design showcase, Behance trending UI/UX, isometric perspective, high-tech dark studio background --ar 16:9 --style raw",
-    parameters: "--ar 16:9 --v 6.1"
-  },
-  {
-    id: "p7",
-    type: "video",
-    title: "Hypercar Aerodynamic Wind Tunnel Aerodynamics Visualization",
-    target: "Runway Gen-3 / Sora",
-    promptText: "Dramatic wind tunnel test of a matte-black electric hypercar prototype. Glowing white neon streamlines flow across sculpted carbon-fiber aerodynamics, vortex currents swirling off the rear diffuser. Low-angle tracking shot, cinematic studio lighting with deep obsidian shadows, 4k 60fps photorealism, industrial design precision.",
-    parameters: "Aspect Ratio: 16:9 | Camera: Low Dolly Track | Physics: CFD Particle Simulation"
-  },
-  {
-    id: "p8",
-    type: "image",
-    title: "Monolithic Brutalist Concrete Villa Overlooking Misty Ocean",
-    target: "Flux.1 Pro / Midjourney v6.1",
-    promptText: "Monumental brutalist architectural residence constructed from board-formed raw concrete cantilevered over a stormy cliffside ocean in Norway. Massive floor-to-ceiling glass windows showing warm amber interior light against overcast Nordic twilight. Waves crashing on black volcanic rocks below, Architectural Digest photography, tilt-shift lens, pristine composition --ar 16:9 --style raw",
-    parameters: "--ar 16:9 --style raw --v 6.1 --chaos 10"
-  },
-  {
-    id: "p9",
-    type: "agent",
-    title: "Zero-Downtime Database Migration & Schema Sharding Architect",
-    target: "Claude 3.5 Sonnet / GPT-4o",
-    promptText: `You are a Principal Database Reliability Engineer specializing in high-concurrency systems.
-Given a legacy relational schema and target traffic profile:
-1. Formulate a blue-green zero-downtime dual-write migration strategy.
-2. Generate idempotent forward and rollback SQL migrations with backfill throttling.
-3. Define conflict resolution strategies for concurrent row updates.
-4. Provide the monitoring queries to track replication lag and lock contention in real time.`,
-    parameters: "Role: Database Reliability Principal | Strategy: Expand & Contract Dual-Write"
-  }
-];
-
 // Current State
 let currentWorkflow = PRESET_WORKFLOWS[0];
 let isSimulating = false;
-let activeMode = "workflows"; // 'workflows' | 'multimodal' | 'predata'
 
 // DOM Initialization
 document.addEventListener("DOMContentLoaded", () => {
@@ -247,14 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   } catch (err) {
     console.error("Error initializing catalog:", err);
-  }
-
-  try {
-    if (typeof renderPromptBank === "function") {
-      renderPromptBank(PRESET_PROMPTS_BANK);
-    }
-  } catch (err) {
-    console.error("Error initializing prompt bank:", err);
   }
 
   try {
@@ -278,23 +170,12 @@ function setupEventListeners() {
   }
 }
 
-// Mode Switcher (Workflows / Prompt Extractor / Pre-Data Bank)
-window.switchMainMode = function(mode, btn) {
-  activeMode = mode;
-  document.querySelectorAll(".mode-tab-btn").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-
-  const wfSection = document.getElementById("workflows-view");
-  const mmSection = document.getElementById("multimodal-view");
-  const predataSection = document.getElementById("predata-view");
-
-  if (wfSection) wfSection.style.display = (mode === "workflows") ? "block" : "none";
-  if (mmSection) mmSection.style.display = (mode === "multimodal") ? "block" : "none";
-  if (predataSection) predataSection.style.display = (mode === "predata") ? "block" : "none";
-
-  if (mode === "workflows") {
-    setTimeout(drawConnections, 60);
-  }
+// Focus Workflow Generator
+window.focusWorkflowInput = function() {
+  const generator = document.getElementById("generator");
+  const input = document.getElementById("prompt-input");
+  if (generator) generator.scrollIntoView({ behavior: "smooth" });
+  if (input) setTimeout(() => input.focus(), 350);
 };
 
 // Quick Prompt Chips
@@ -302,31 +183,35 @@ window.applyQuickPrompt = function(promptText) {
   const input = document.getElementById("prompt-input");
   if (input) {
     input.value = promptText;
-    synthesizeWorkflowFromPrompt(promptText);
-    const studio = document.getElementById("studio");
-    if (studio) studio.scrollIntoView({ behavior: "smooth" });
   }
+  synthesizeWorkflowFromPrompt(promptText);
 };
 
-// AI Workflow Synthesizer
+// AI Workflow Synthesizer - Automatically opens and scrolls to Workflow Canvas View
 window.synthesizeWorkflowFromPrompt = function(prompt) {
   const submitBtn = document.getElementById("prompt-submit-btn");
   if (submitBtn) {
     submitBtn.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-      <span>Synthesizing...</span>
+      <span>Synthesizing Pipeline...</span>
     `;
     submitBtn.disabled = true;
   }
 
-  logConsole("SYNTHESIZER", `Parsing prompt: "${prompt}"`, "info");
+  // Smooth scroll directly to the Interactive Workflow Studio Canvas
+  const studio = document.getElementById("studio");
+  if (studio) {
+    studio.scrollIntoView({ behavior: "smooth" });
+  }
+
+  logConsole("SYNTHESIZER", `Parsing workflow prompt: "${prompt}"`, "info");
 
   setTimeout(() => {
     const synthesized = generateNodesFromPrompt(prompt);
     currentWorkflow = synthesized;
     renderCanvas(currentWorkflow);
 
-    logConsole("ORCHESTRATOR", `Synthesized ${synthesized.nodes.length}-node pipeline ready.`, "success");
+    logConsole("ORCHESTRATOR", `Synthesized ${synthesized.nodes.length}-node pipeline ready. Active on visual canvas.`, "success");
 
     if (submitBtn) {
       submitBtn.innerHTML = `
@@ -337,7 +222,7 @@ window.synthesizeWorkflowFromPrompt = function(prompt) {
     }
 
     simulateWorkflowRun();
-  }, 1000);
+  }, 800);
 };
 
 // Heuristic Generator
@@ -747,529 +632,14 @@ window.loadWorkflowIntoCanvas = function(workflowId) {
   }
 };
 
-/* ==========================================================================
-   MULTIMODAL PROMPT REPLICATOR ENGINE (FILE UPLOAD & REVERSE ENGINEERING)
-   ========================================================================== */
-
-let mmActiveTab = "video"; // 'video' | 'image' | 'agent'
-let currentUploadedFile = null;
-let currentMediaMetadata = {
-  name: "",
-  sizeMB: 0,
-  durationSec: 0,
-  width: 1920,
-  height: 1080,
-  aspect: "16:9",
-  type: "video"
-};
-
-// Mode Switcher for Multimodal Tab
-window.switchMmTab = function(tab, btn) {
-  mmActiveTab = tab;
-  document.querySelectorAll(".mm-tab-btn").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-
-  const dropzone = document.getElementById("mm-file-dropzone");
-  const dropTitle = document.getElementById("dropzone-title");
-  const dropSub = document.getElementById("dropzone-subtitle");
-  const titleEl = document.getElementById("mm-input-title");
-  const textarea = document.getElementById("mm-input-text");
-  const targetBadge = document.getElementById("mm-target-badge");
-  const targetEngine = document.getElementById("mm-target-engine");
-
-  clearSelectedMedia();
-
-  if (tab === "video") {
-    if (dropzone) dropzone.style.display = "block";
-    if (dropTitle) dropTitle.textContent = "Upload Video File to Analyze";
-    if (dropSub) dropSub.textContent = "Drag & drop MP4, MOV, WEBM (Max: 50MB, Max: 60s)";
-    if (titleEl) titleEl.querySelector("span").textContent = "Or Paste Video URL / Scene Notes:";
-    if (textarea) textarea.placeholder = "Paste Instagram Reel URL (e.g. https://www.instagram.com/reel/...) or describe scene action, camera motion, lighting...";
-    if (targetBadge) targetBadge.textContent = "Target: Runway Gen-3 Alpha";
-    if (targetEngine) targetEngine.value = "runway";
-  } else if (tab === "image") {
-    if (dropzone) dropzone.style.display = "block";
-    if (dropTitle) dropTitle.textContent = "Upload Image File to Analyze";
-    if (dropSub) dropSub.textContent = "Drag & drop PNG, JPG, WEBP (Max: 15MB)";
-    if (titleEl) titleEl.querySelector("span").textContent = "Or Paste Image URL / Visual Notes:";
-    if (textarea) textarea.placeholder = "Paste image URL or describe composition, lighting, lens type, subject details...";
-    if (targetBadge) targetBadge.textContent = "Target: Midjourney v6.1";
-    if (targetEngine) targetEngine.value = "midjourney";
-  } else {
-    // Text to agent prompt
-    if (dropzone) dropzone.style.display = "none";
-    if (titleEl) titleEl.querySelector("span").textContent = "Describe Agent Goal & Constraints:";
-    if (textarea) textarea.placeholder = "e.g. Build an autonomous code reviewer that checks PR diffs for SQL injections, O(n^2) loops, and outputs strict JSON diffs...";
-    if (targetBadge) targetBadge.textContent = "Target: Claude 3.5 Sonnet / Cursor";
-    if (targetEngine) targetEngine.value = "claude";
+// External Redirection to GravityClaw Master Prompt Generator
+window.openGravityClaw = function(category = "all") {
+  const url = new URL("https://gravityclaw.winplaybox.in/");
+  if (category && category !== "all") {
+    url.searchParams.set("category", category);
   }
-};
-
-window.onTargetEngineChange = function() {
-  const sel = document.getElementById("mm-target-engine");
-  const badge = document.getElementById("mm-target-badge");
-  if (sel && badge) {
-    badge.textContent = `Target: ${sel.options[sel.selectedIndex].text.split(" ")[0]} Engine`;
-  }
-};
-
-// File Upload Triggers & Drag-Drop Handling
-window.triggerFileInput = function() {
-  const fileInput = document.getElementById("mm-file-input");
-  if (fileInput) {
-    if (mmActiveTab === "video") {
-      fileInput.accept = "video/mp4,video/quicktime,video/webm";
-    } else {
-      fileInput.accept = "image/png,image/jpeg,image/webp,image/jpg";
-    }
-    fileInput.click();
-  }
-};
-
-window.handleDragOver = function(e) {
-  e.preventDefault();
-  const dropzone = document.getElementById("mm-file-dropzone");
-  if (dropzone) dropzone.classList.add("drag-active");
-};
-
-window.handleDragLeave = function(e) {
-  e.preventDefault();
-  const dropzone = document.getElementById("mm-file-dropzone");
-  if (dropzone) dropzone.classList.remove("drag-active");
-};
-
-window.handleFileDrop = function(e) {
-  e.preventDefault();
-  const dropzone = document.getElementById("mm-file-dropzone");
-  if (dropzone) dropzone.classList.remove("drag-active");
-
-  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-    processSelectedMedia(e.dataTransfer.files[0]);
-  }
-};
-
-window.handleFileSelect = function(e) {
-  if (e.target.files && e.target.files.length > 0) {
-    processSelectedMedia(e.target.files[0]);
-  }
-};
-
-// Process Uploaded File with Strict Size & Duration Limits
-function processSelectedMedia(file) {
-  const isVideo = file.type.startsWith("video/");
-  const isImage = file.type.startsWith("image/");
-
-  // 1. Strict Size Validation
-  const maxVideoSize = 50 * 1024 * 1024; // 50MB
-  const maxImageSize = 15 * 1024 * 1024; // 15MB
-
-  if (isVideo && file.size > maxVideoSize) {
-    alert(`⚠️ File Size Exceeded!\nSelected video is ${(file.size / (1024 * 1024)).toFixed(1)} MB.\nMaximum allowed size is 50MB to prevent server overload. Please select a shorter or compressed clip.`);
-    return;
-  }
-
-  if (isImage && file.size > maxImageSize) {
-    alert(`⚠️ File Size Exceeded!\nSelected image is ${(file.size / (1024 * 1024)).toFixed(1)} MB.\nMaximum allowed size is 15MB. Please choose an optimized image.`);
-    return;
-  }
-
-  currentUploadedFile = file;
-  const fileUrl = URL.createObjectURL(file);
-  const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
-
-  currentMediaMetadata.name = file.name;
-  currentMediaMetadata.sizeMB = sizeMB;
-  currentMediaMetadata.type = isVideo ? "video" : "image";
-
-  // Display Preview Box
-  const previewBox = document.getElementById("mm-media-preview-box");
-  const dropzone = document.getElementById("mm-file-dropzone");
-  const previewMount = document.getElementById("preview-media-mount");
-  const fileNameEl = document.getElementById("preview-filename");
-  const sizeEl = document.getElementById("metric-filesize");
-  const durationEl = document.getElementById("metric-duration");
-  const resEl = document.getElementById("metric-res");
-  const aspectEl = document.getElementById("metric-aspect");
-  const keyframesSection = document.getElementById("keyframes-section");
-  const keyframesMount = document.getElementById("keyframes-mount");
-
-  if (dropzone) dropzone.style.display = "none";
-  if (previewBox) previewBox.style.display = "block";
-  if (fileNameEl) fileNameEl.textContent = file.name;
-  if (sizeEl) sizeEl.textContent = `${sizeMB} MB`;
-
-  if (isVideo) {
-    const video = document.createElement("video");
-    video.src = fileUrl;
-    video.controls = true;
-    video.autoplay = false;
-    video.className = "media-preview-player";
-
-    if (previewMount) {
-      previewMount.innerHTML = "";
-      previewMount.appendChild(video);
-    }
-
-    video.onloadedmetadata = function() {
-      // Duration check: Max 60 seconds
-      if (video.duration > 60) {
-        alert(`⚠️ Video Duration Exceeded!\nVideo duration is ${Math.round(video.duration)} seconds.\nMaximum allowed length is 60 seconds for AI frame extraction. Please trim your video.`);
-        clearSelectedMedia();
-        return;
-      }
-
-      const durSec = Math.round(video.duration);
-      const w = video.videoWidth;
-      const h = video.videoHeight;
-      const aspect = (w < h) ? "9:16 (Vertical Reel)" : "16:9 (Cinematic)";
-
-      currentMediaMetadata.durationSec = durSec;
-      currentMediaMetadata.width = w;
-      currentMediaMetadata.height = h;
-      currentMediaMetadata.aspect = aspect;
-
-      if (durationEl) durationEl.textContent = `${durSec}s`;
-      if (resEl) resEl.textContent = `${w}x${h}`;
-      if (aspectEl) aspectEl.textContent = aspect;
-
-      // Extract 3 Keyframes using HTML5 Canvas
-      if (keyframesSection && keyframesMount) {
-        keyframesSection.style.display = "block";
-        keyframesMount.innerHTML = "";
-        extractVideoKeyframes(video, keyframesMount, durSec);
-      }
-    };
-
-  } else if (isImage) {
-    const img = document.createElement("img");
-    img.src = fileUrl;
-    img.className = "media-preview-img";
-
-    if (previewMount) {
-      previewMount.innerHTML = "";
-      previewMount.appendChild(img);
-    }
-
-    img.onload = function() {
-      const w = img.naturalWidth;
-      const h = img.naturalHeight;
-      const aspect = (w < h) ? "4:5 (Portrait)" : (w === h ? "1:1 (Square)" : "16:9 (Landscape)");
-
-      currentMediaMetadata.width = w;
-      currentMediaMetadata.height = h;
-      currentMediaMetadata.aspect = aspect;
-
-      if (durationEl) durationEl.textContent = "Static";
-      if (resEl) resEl.textContent = `${w}x${h}`;
-      if (aspectEl) aspectEl.textContent = aspect;
-      if (keyframesSection) keyframesSection.style.display = "none";
-    };
-  }
-}
-
-// Extract 3 representative keyframes across video duration
-function extractVideoKeyframes(video, mount, duration) {
-  const timestamps = [0.5, Math.max(1, duration * 0.5), Math.max(1.5, duration * 0.85)];
-  
-  timestamps.forEach((ts, idx) => {
-    const item = document.createElement("div");
-    item.className = "keyframe-item";
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 160;
-    canvas.height = 90;
-    const ctx = canvas.getContext("2d");
-
-    // Seek temporary video to timestamp
-    const tempVideo = document.createElement("video");
-    tempVideo.src = video.src;
-    tempVideo.currentTime = ts;
-    tempVideo.onseeked = function() {
-      ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
-    };
-
-    item.appendChild(canvas);
-
-    const timeBadge = document.createElement("div");
-    timeBadge.className = "keyframe-timestamp";
-    timeBadge.textContent = `${ts.toFixed(1)}s`;
-    item.appendChild(timeBadge);
-
-    mount.appendChild(item);
-  });
-}
-
-// Clear selected media
-window.clearSelectedMedia = function() {
-  currentUploadedFile = null;
-  const previewBox = document.getElementById("mm-media-preview-box");
-  const dropzone = document.getElementById("mm-file-dropzone");
-  const previewMount = document.getElementById("preview-media-mount");
-  const fileInput = document.getElementById("mm-file-input");
-
-  if (previewMount) previewMount.innerHTML = "";
-  if (previewBox) previewBox.style.display = "none";
-  if (dropzone) dropzone.style.display = (mmActiveTab === "agent") ? "none" : "block";
-  if (fileInput) fileInput.value = "";
-};
-
-// Master Prompt Reverse Engineering Engine
-window.reverseEngineerPrompt = function() {
-  const textInput = document.getElementById("mm-input-text");
-  const masterBox = document.getElementById("mm-output-result");
-  const paramsBox = document.getElementById("mm-output-params");
-  const negativeBox = document.getElementById("mm-output-negative");
-  const btn = document.getElementById("mm-generate-btn");
-  const engineSel = document.getElementById("mm-target-engine");
-
-  const targetEngine = engineSel ? engineSel.value : "runway";
-  const rawText = textInput ? textInput.value.trim() : "";
-
-  if (!currentUploadedFile && !rawText) {
-    alert("Please upload a video or image file (or paste a scene description / URL) to analyze.");
-    return;
-  }
-
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-      <span>Analyzing Visual Media & Synthesizing Exact Prompt...</span>
-    `;
-  }
-
-  setTimeout(() => {
-    let masterPrompt = "";
-    let paramsText = "";
-    let negativeText = "blurry, low resolution, warped hands, distorted facial features, artifacts, frame jitter, unnatural physics, washed out contrast";
-
-    const hasInstagram = rawText.includes("instagram.com");
-    const hasTikTok = rawText.includes("tiktok.com");
-    const hasYouTube = rawText.includes("youtube.com") || rawText.includes("youtu.be");
-
-    // Cleaned scene description (CRITICAL: Removes external URLs completely!)
-    let cleanedScene = "";
-    if (hasInstagram || hasTikTok || hasYouTube) {
-      if (rawText.toLowerCase().includes("vlog") || rawText.toLowerCase().includes("dhrusavlogs")) {
-        cleanedScene = "A cinematic handheld 4K travel vlog POV navigating through a bustling open-air street bazaar. The camera follows fluid natural movements past colorful artisanal stalls, sunlight filtering through canopy textiles, authentic documentary atmosphere, natural depth of field with 28mm prime lens.";
-      } else {
-        cleanedScene = "A dynamic high-energy vertical video sequence with smooth fluid camera movement, crisp focal transitions, authentic real-world environmental lighting, and hyper-realistic physics.";
-      }
-    } else if (rawText) {
-      cleanedScene = rawText;
-    } else if (currentUploadedFile) {
-      if (currentMediaMetadata.aspect.includes("9:16")) {
-        cleanedScene = `A crisp, vertical 9:16 mobile-first video capture of ${currentMediaMetadata.name.replace(/\.[^/.]+$/, "")}. Cinematic natural lighting, shallow depth of field, sharp foreground focal point, fluid organic motion cadence, vibrant natural color grade.`;
-      } else {
-        cleanedScene = `A widescreen 16:9 cinematic production shot of ${currentMediaMetadata.name.replace(/\.[^/.]+$/, "")}. 35mm anamorphic prime lens, dramatic volumetric illumination, ray-traced ambient lighting, authentic micro-textures, zero motion blur.`;
-      }
-    }
-
-    // 1. VIDEO ENGINE GENERATION
-    if (mmActiveTab === "video") {
-      if (targetEngine === "sora") {
-        masterPrompt = `${cleanedScene} Photorealistic 4K render pass, 35mm anamorphic prime lens, continuous steady tracking camera motion, natural specular highlights, fluid micro-particle physics, realistic cloth and hair kinetics, 60fps cinematic frame rate.`;
-        paramsText = `Aspect Ratio: ${currentMediaMetadata.aspect.includes("9:16") ? "9:16" : "16:9"} | Engine: OpenAI Sora | Optics: 35mm f/1.8 | Motion Scale: 5 | Render: Photorealism`;
-      } else if (targetEngine === "runway") {
-        masterPrompt = `${cleanedScene} Directed by cinematic filmmaker, high-speed camera tracking, volumetric golden hour illumination, rich dynamic range, shallow depth of field, organic camera pan, hyper-realistic physical consistency across frames.`;
-        paramsText = `Aspect Ratio: ${currentMediaMetadata.aspect.includes("9:16") ? "9:16" : "16:9"} | Engine: Runway Gen-3 Alpha | Motion Score: 6.5 | Camera: Pan & Tilt Smooth | Speed: 1.0x`;
-      } else if (targetEngine === "kling") {
-        masterPrompt = `${cleanedScene} Ultra-realistic live-action footage, Hasselblad medium format capture, seamless temporal coherence, authentic environmental reflections, natural skin texture and real-world atmospheric depth.`;
-        paramsText = `Mode: Professional 1080p | Duration: 5s / 10s | CFG Scale: 0.6 | Camera Motion: Orbit & Dolly`;
-      } else {
-        masterPrompt = `${cleanedScene} High-fidelity cinematic footage, fluid zero-gravity liquid physics, volumetric ray tracing, pristine visual clarity, 4K UHD.`;
-        paramsText = `Engine: Luma Dream Machine / Pika 2.0 | Aspect: ${currentMediaMetadata.aspect.includes("9:16") ? "9:16" : "16:9"} | Motion: Smooth`;
-      }
-
-    // 2. IMAGE ENGINE GENERATION
-    } else if (mmActiveTab === "image") {
-      masterPrompt = `${cleanedScene}, shot on Hasselblad H6D-100c, 85mm f/1.4 prime lens, dramatic chiaroscuro studio lighting, subsurface scattering, tactile material texture, rich tonal gradients, fine grain details, octane render pass, cinematic composition --ar ${currentMediaMetadata.aspect.includes("4:5") ? "4:5" : (currentMediaMetadata.aspect.includes("1:1") ? "1:1" : "16:9")} --style raw --v 6.1 --s 250`;
-      paramsText = `--ar ${currentMediaMetadata.aspect.includes("4:5") ? "4:5" : "16:9"} --style raw --v 6.1 --stylize 250 --quality 2`;
-
-    // 3. AGENT ENGINE GENERATION
-    } else {
-      masterPrompt = `You are a Principal Software Engineer & Autonomous Agent Orchestrator.
-OBJECTIVE: Execute the following task with deterministic precision:
-"${cleanedScene}"
-
-## STRICT OPERATIONAL CONSTRAINTS:
-1. Deconstruct the user input into measurable sub-actions.
-2. Formulate execution logic using production-grade libraries and zero deprecated APIs.
-3. Validate all payloads against OWASP security thresholds.
-
-## OUTPUT FORMAT:
-Respond with structured, copyable JSON containing:
-{
-  "status": "READY_FOR_DEPLOYMENT",
-  "pipeline_name": "Autonomous Agent",
-  "directives": ["Step 1...", "Step 2..."],
-  "code_payload": "// Production code..."
-}`;
-      paramsText = `Role: Principal Architect | Temperature: 0.1 | Output: Strict Schema JSON | Model: Claude 3.5 Sonnet`;
-    }
-
-    if (masterBox) masterBox.textContent = masterPrompt;
-    if (paramsBox) paramsBox.textContent = paramsText;
-    if (negativeBox) negativeBox.textContent = negativeText;
-
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        <span>Analyze Media &amp; Extract Exact Master Prompt</span>
-      `;
-    }
-  }, 850);
-};
-
-// Copy Multimodal Output (Master or All Settings)
-window.copyMmPrompt = function(mode = "master") {
-  const masterBox = document.getElementById("mm-output-result");
-  const paramsBox = document.getElementById("mm-output-params");
-  const negativeBox = document.getElementById("mm-output-negative");
-  const btn = document.getElementById("mm-copy-btn");
-
-  let textToCopy = "";
-  if (mode === "master") {
-    textToCopy = masterBox ? masterBox.textContent : "";
-  } else {
-    textToCopy = `// MASTER PROMPT:\n${masterBox ? masterBox.textContent : ""}\n\n// TECHNICAL DIRECTIVES:\n${paramsBox ? paramsBox.textContent : ""}\n\n// NEGATIVE PROMPTS:\n${negativeBox ? negativeBox.textContent : ""}`;
-  }
-
-  if (textToCopy) {
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      if (btn) {
-        const orig = btn.innerHTML;
-        btn.innerHTML = "<span>✓ Copied to Clipboard!</span>";
-        setTimeout(() => { btn.innerHTML = orig; }, 1800);
-      }
-    });
-  }
-};
-
-// Download Prompt as .txt file
-window.downloadPromptTxt = function() {
-  const masterBox = document.getElementById("mm-output-result");
-  const paramsBox = document.getElementById("mm-output-params");
-  const negativeBox = document.getElementById("mm-output-negative");
-
-  const fullText = `OMNI AI WORKFLOWS - EXTRACTED MASTER PROMPT\nPlatform: https://omni.winplaybox.in\nTimestamp: ${new Date().toISOString()}\n\n=======================================================\nMASTER PROMPT:\n=======================================================\n${masterBox ? masterBox.textContent : ""}\n\n=======================================================\nCAMERA & RENDER DIRECTIVES:\n=======================================================\n${paramsBox ? paramsBox.textContent : ""}\n\n=======================================================\nNEGATIVE PROMPT QUALITY FILTERS:\n=======================================================\n${negativeBox ? negativeBox.textContent : ""}\n`;
-
-  const blob = new Blob([fullText], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `omni-prompt-${Date.now()}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
-
-/* ==========================================================================
-   PRE-DATA CURATED PROMPT BANK
-   ========================================================================== */
-
-function renderPromptBank(prompts) {
-  const grid = document.getElementById("prompts-bank-mount");
-  if (!grid) return;
-
-  grid.innerHTML = "";
-
-  if (!prompts || prompts.length === 0) {
-    grid.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1rem; color: var(--text-muted); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md);">
-        <p style="font-size: 1rem; margin-bottom: 0.75rem; color: #ffffff; font-weight: 600;">No master prompts match this filter</p>
-        <button type="button" class="btn-secondary" style="font-size: 0.82rem; padding: 0.45rem 0.9rem;" onclick="filterPromptBank('all', document.querySelector('.prompt-tab-btn'))">
-          View All Prompts
-        </button>
-      </div>
-    `;
-    return;
-  }
-
-  prompts.forEach(p => {
-    const card = document.createElement("div");
-    card.className = "prompt-card";
-    card.innerHTML = `
-      <div class="prompt-card-header">
-        <span class="prompt-type-pill">${escapeHtml(p.type)} prompt</span>
-        <span style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(p.target)}</span>
-      </div>
-      <h3 class="prompt-card-title">${escapeHtml(p.title)}</h3>
-      <div class="prompt-snippet">${escapeHtml(p.promptText)}</div>
-      <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">
-        <strong>Parameters:</strong> ${escapeHtml(p.parameters)}
-      </div>
-      <div style="display: flex; gap: 0.5rem; margin-top: auto; flex-wrap: wrap;">
-        <button type="button" class="btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; flex: 1; min-width: 140px;" onclick="copySinglePrompt('${p.id}', this)">
-          Copy Prompt
-        </button>
-        <button type="button" class="btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" onclick="openInGravityClaw('${p.id}')" title="Generate variations & multi-modules in GravityClaw">
-          GravityClaw ↗
-        </button>
-        <button type="button" class="btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" onclick="loadPromptIntoExtractor('${p.id}')">
-          Edit
-        </button>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-// Filter Curated Prompt Bank by Type (all / video / image / agent)
-window.filterPromptBank = function(type, btn) {
-  document.querySelectorAll(".prompt-tab-btn").forEach(b => b.classList.remove("active"));
-  if (btn) btn.classList.add("active");
-
-  if (!type || type === "all") {
-    renderPromptBank(PRESET_PROMPTS_BANK);
-  } else {
-    const filtered = PRESET_PROMPTS_BANK.filter(p => p.type === type);
-    renderPromptBank(filtered);
-  }
-};
-
-window.copySinglePrompt = function(id, btn) {
-  const promptObj = PRESET_PROMPTS_BANK.find(p => p.id === id);
-  if (promptObj) {
-    navigator.clipboard.writeText(promptObj.promptText).then(() => {
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = "✓ Copied!";
-        setTimeout(() => { btn.textContent = orig; }, 1800);
-      }
-    });
-  }
-};
-
-window.openInGravityClaw = function(id) {
-  const promptObj = PRESET_PROMPTS_BANK.find(p => p.id === id);
-  if (promptObj) {
-    const url = new URL("https://gravityclaw.winplaybox.in/");
-    url.searchParams.set("prompt", promptObj.promptText);
-    url.searchParams.set("title", promptObj.title);
-    url.searchParams.set("category", promptObj.type || "agent");
-    url.searchParams.set("utm_source", "omni_workflows");
-    window.open(url.toString(), "_blank", "noopener");
-  }
-};
-
-window.loadPromptIntoExtractor = function(id) {
-  const promptObj = PRESET_PROMPTS_BANK.find(p => p.id === id);
-  if (promptObj) {
-    const mmTabBtn = document.querySelector(`.mm-tab-btn[data-tab="${promptObj.type === 'agent' ? 'agent' : promptObj.type}"]`);
-    switchMainMode('multimodal', document.querySelectorAll('.mode-tab-btn')[1]);
-    if (mmTabBtn) switchMmTab(promptObj.type === 'agent' ? 'agent' : promptObj.type, mmTabBtn);
-
-    const input = document.getElementById("mm-input-text");
-    if (input) input.value = promptObj.promptText;
-
-    const outputBox = document.getElementById("mm-output-result");
-    if (outputBox) outputBox.textContent = promptObj.promptText;
-
-    document.getElementById("multimodal-view").scrollIntoView({ behavior: "smooth" });
-  }
+  url.searchParams.set("utm_source", "omni_workflows");
+  window.open(url.toString(), "_blank", "noopener");
 };
 
 // Export Modal
