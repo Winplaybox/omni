@@ -467,7 +467,7 @@
         <!-- Body Area: Google CSE Results Styled Natively -->
         <div class="wpb-search-body">
           <div id="wpb-cse-render">
-            <div class="gcse-search" data-queryParameterName="q" data-enableAutoComplete="true"></div>
+            <div class="gcse-search" data-linkTarget="_blank" data-queryParameterName="q" data-enableAutoComplete="true"></div>
           </div>
         </div>
 
@@ -575,6 +575,15 @@
       closeSearch();
     }
   });
+
+  // Ensure all search result links open in a new tab
+  root.addEventListener("click", (e) => {
+    const link = e.target.closest("a");
+    if (link && !link.classList.contains("gsc-cursor-page") && !link.classList.contains("wpb-search-chip")) {
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener noreferrer");
+    }
+  }, true);
 
   // Expose Global Helper
   window.WinPlayBoxSearch = {
