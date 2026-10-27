@@ -154,6 +154,24 @@ document.addEventListener("DOMContentLoaded", () => {
   } catch (err) {
     console.error("Error setting up event listeners:", err);
   }
+
+  // Handle incoming search / prompt / workflow parameters (?prompt=, ?q=, ?workflow=, ?search=)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("prompt") || params.get("q") || params.get("workflow") || params.get("search");
+    if (query && query.trim()) {
+      const trimmed = query.trim();
+      const input = document.getElementById("prompt-input");
+      if (input) input.value = trimmed;
+      setTimeout(() => {
+        if (typeof window.synthesizeWorkflowFromPrompt === "function") {
+          window.synthesizeWorkflowFromPrompt(trimmed);
+        }
+      }, 350);
+    }
+  } catch (err) {
+    console.warn("Error parsing URL parameters in Omni:", err);
+  }
 });
 
 // Setup Event Handlers
