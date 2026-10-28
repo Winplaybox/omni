@@ -133,6 +133,30 @@
   <main class="container" style="max-width: 960px; padding-bottom: 5rem;">
 
     <!-- Automated Daily Workflow Drop -->
+    <article class="blog-article-full" id="auto-wf-1793183308799">
+      <div class="article-meta">
+        <span class="wf-card-domain">Cloud & DevOps</span> &bull; 
+        <span>Published: Oct 28, 2026 (Automated)</span> &bull; 
+        <span>4 Nodes</span>
+      </div>
+      <h2>Serverless Database Disaster Recovery & Automated S3 Mirroring</h2>
+      <p>Runs every 24 hours to take encrypted point-in-time snapshots of Supabase PostgreSQL clusters, uploads to AWS S3 Glacier with KMS key encryption, and verifies SHA-256 checksums.</p>
+
+      <h3>1. Data Flow Topology</h3>
+      <div class="topology-box">
+[Daily 02:00 AM UTC Cron] ──> [Supabase Snapshot Dump]
+                           ──> [KMS Envelope Encryption]
+                           ──> [AWS S3 Glacier Cross-Region Replication]
+                           ──> [Datadog & Slack Verification Ping]
+      </div>
+
+      <a href="index.html#studio" class="btn-primary" style="margin-top: 1rem;">
+        <span>Open in Omni Canvas Studio &rarr;</span>
+      </a>
+    </article>
+
+
+    <!-- Automated Daily Workflow Drop -->
     <article class="blog-article-full" id="auto-wf-1793094207936">
       <div class="article-meta">
         <span class="wf-card-domain">Sales & Marketing</span> &bull; 
