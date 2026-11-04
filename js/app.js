@@ -158,7 +158,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle incoming search / prompt / workflow parameters (?prompt=, ?q=, ?workflow=, ?search=)
   try {
     const params = new URLSearchParams(window.location.search);
-    const query = params.get("prompt") || params.get("q") || params.get("workflow") || params.get("search");
+    let query = params.get("prompt") || params.get("q") || params.get("workflow") || params.get("search") || "";
+    
+    // Check shared localStorage if transferred directly from GravityClaw
+    try {
+      const stored = localStorage.getItem("wpb_omni_prompt");
+      if (stored && stored.trim()) {
+        query = stored.trim();
+        localStorage.removeItem("wpb_omni_prompt");
+      }
+    } catch (e) {
+      /* cross-domain or sandbox fallback */
+    }
+
     if (query && query.trim()) {
       const trimmed = query.trim();
       const input = document.getElementById("prompt-input");
@@ -167,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof window.synthesizeWorkflowFromPrompt === "function") {
           window.synthesizeWorkflowFromPrompt(trimmed);
         }
-      }, 350);
+      }, 400);
     }
   } catch (err) {
     console.warn("Error parsing URL parameters in Omni:", err);
@@ -177,12 +189,23 @@ document.addEventListener("DOMContentLoaded", () => {
 // Setup Event Handlers
 function setupEventListeners() {
   const promptForm = document.getElementById("prompt-generator-form");
+  const promptInput = document.getElementById("prompt-input");
+
   if (promptForm) {
     promptForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const input = document.getElementById("prompt-input");
       if (input && input.value.trim()) {
         synthesizeWorkflowFromPrompt(input.value.trim());
+      }
+    });
+  }
+
+  if (promptInput) {
+    promptInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        if (promptForm) promptForm.requestSubmit();
       }
     });
   }
@@ -243,64 +266,81 @@ window.synthesizeWorkflowFromPrompt = function(prompt) {
   }, 800);
 };
 
-// Heuristic Generator
+// Heuristic Generator - Expanded with high-fidelity domains (Animation, Devotional, E-Commerce, DevOps)
 function generateNodesFromPrompt(prompt) {
   const p = prompt.toLowerCase();
   const nodes = [];
   let domain = "Custom AI";
 
-  // Trigger
-  if (p.includes("schedule") || p.includes("cron") || p.includes("hour") || p.includes("daily")) {
-    nodes.push({ id: "n1", type: "trigger", title: "Cron Timer Trigger", service: "Schedule Engine", badge: "Trigger" });
-  } else if (p.includes("stripe") || p.includes("payment")) {
-    nodes.push({ id: "n1", type: "trigger", title: "Stripe Webhook Event", service: "Stripe API", badge: "Trigger" });
-    domain = "Fintech";
-  } else if (p.includes("video") || p.includes("youtube")) {
-    nodes.push({ id: "n1", type: "trigger", title: "Video Stream Ingestion", service: "YouTube RSS / Webhook", badge: "Trigger" });
-    domain = "Media & Video";
-  } else if (p.includes("github") || p.includes("pr") || p.includes("issue")) {
-    nodes.push({ id: "n1", type: "trigger", title: "GitHub Event Webhook", service: "GitHub REST API", badge: "Trigger" });
-    domain = "DevOps";
-  } else {
-    nodes.push({ id: "n1", type: "trigger", title: "HTTP Request Inbound", service: "Omni Webhook Trigger", badge: "Trigger" });
+  // 1. Devotional / Spiritual / Mythological (e.g. Shiva, Hanuman, Krishna, Ram, Bhajan, Temple)
+  if (p.includes("shiva") || p.includes("hanuman") || p.includes("krishna") || p.includes("ram") || p.includes("bhajan") || p.includes("devotional") || p.includes("temple") || p.includes("aarti") || p.includes("tandav")) {
+    domain = "Devotional Media";
+    nodes.push({ id: "n1", type: "trigger", title: "Sacred Brief & Shloka Trigger", service: "GravityClaw Devotional Engine", badge: "Trigger" });
+    nodes.push({ id: "n2", type: "action", title: "Vedic Narrative & Beat Synthesizer", service: "Claude 3.5 Sonnet / Script Engine", badge: "Narrative AI" });
+    nodes.push({ id: "n3", type: "ai", title: "Hyper-Realistic Devas Visual Staging", service: "Midjourney v6.1 / Kling 1.5 HD", badge: "Visual Render" });
+    nodes.push({ id: "n4", type: "action", title: "Aarti BGM & Sanskrit Voiceover", service: "Suno v4 / ElevenLabs TTS", badge: "Audio Synthesis" });
+    nodes.push({ id: "n5", type: "output", title: "Autonomous 4K Shorts Dispatch", service: "YouTube Shorts & Instagram Reels", badge: "Broadcast" });
   }
-
-  // Action / Data
-  if (p.includes("scrape") || p.includes("crawl") || p.includes("monitor")) {
-    nodes.push({ id: "n2", type: "action", title: "Headless Browser Scrape", service: "Playwright Engine", badge: "Data Ingestion" });
-  } else if (p.includes("transcribe") || p.includes("audio")) {
-    nodes.push({ id: "n2", type: "action", title: "Whisper Audio Transcribe", service: "Whisper Large v3", badge: "Speech AI" });
-  } else {
-    nodes.push({ id: "n2", type: "action", title: "Payload Normalizer", service: "Data Transformer", badge: "Extraction" });
+  // 2. Video / Animation / Shorts / Reels (e.g. Sora, Kling, Runway, Veo, Motion Graphics)
+  else if (p.includes("video") || p.includes("animation") || p.includes("motion") || p.includes("kling") || p.includes("runway") || p.includes("sora") || p.includes("veo") || p.includes("shorts") || p.includes("reel")) {
+    domain = "Media & Animation";
+    nodes.push({ id: "n1", type: "trigger", title: "Creative Animation Brief", service: "GravityClaw Studio Trigger", badge: "Trigger" });
+    nodes.push({ id: "n2", type: "action", title: "Storyboard & Beat Extraction", service: "Gemini 1.5 Pro Long-Context", badge: "Planning AI" });
+    nodes.push({ id: "n3", type: "ai", title: "Cinematic Motion Generation", service: "Kling AI / Runway Gen-3 Alpha", badge: "Motion AI" });
+    nodes.push({ id: "n4", type: "action", title: "Voiceover Narration & Dynamic SFX", service: "ElevenLabs Voice & SFX Engine", badge: "Audio Engine" });
+    nodes.push({ id: "n5", type: "output", title: "Multi-Platform Shorts Delivery", service: "YouTube Shorts / TikTok / Reels", badge: "Delivery" });
   }
-
-  // LLM Reasoning
-  if (p.includes("claude")) {
-    nodes.push({ id: "n3", type: "ai", title: "Complex Reasoning Agent", service: "Claude 3.5 Sonnet", badge: "AI Agent" });
-  } else if (p.includes("gemini")) {
-    nodes.push({ id: "n3", type: "ai", title: "Long-Context Synthesis", service: "Gemini 1.5 Pro", badge: "AI Agent" });
-  } else {
-    nodes.push({ id: "n3", type: "ai", title: "Multimodal Synthesis Agent", service: "GPT-4o Agent Engine", badge: "AI Agent" });
+  // 3. Image / Visual Art / Photography / Midjourney / Flux
+  else if (p.includes("midjourney") || p.includes("flux") || p.includes("image") || p.includes("photo") || p.includes("cinematic") || p.includes("portrait") || p.includes("wallpaper")) {
+    domain = "Generative Design";
+    nodes.push({ id: "n1", type: "trigger", title: "Prompt Anatomy Brief Ingestion", service: "GravityClaw Prompt Hub", badge: "Trigger" });
+    nodes.push({ id: "n2", type: "action", title: "Negative & Lighting Parameterization", service: "FLUX.1 Kontext Tuner", badge: "Conditioning" });
+    nodes.push({ id: "n3", type: "ai", title: "8K Photorealistic Image Synthesis", service: "Midjourney v7 / SDXL ComfyUI", badge: "Asset AI" });
+    nodes.push({ id: "n4", type: "action", title: "Super-Resolution & Color Grade Gate", service: "Real-ESRGAN / Quality Gate", badge: "Post-Processing" });
+    nodes.push({ id: "n5", type: "output", title: "Asset Storage & CDN Multi-Publish", service: "Cloudflare R2 & Social Media API", badge: "Delivery" });
   }
-
-  // Condition Gate
-  nodes.push({ id: "n4", type: "action", title: "Confidence & Gate Validation", service: "Logic Gate", badge: "Gate" });
-
-  // Output
-  if (p.includes("telegram")) {
-    nodes.push({ id: "n5", type: "output", title: "Telegram Channel Alert", service: "Telegram Bot API", badge: "Delivery" });
-  } else if (p.includes("slack")) {
-    nodes.push({ id: "n5", type: "output", title: "Slack Incident Dispatch", service: "Slack Webhook", badge: "Delivery" });
-  } else {
-    nodes.push({ id: "n5", type: "output", title: "Multi-Platform Output", service: "REST / Webhook / DB", badge: "Delivery" });
+  // 4. E-Commerce / Multi-Store Price Intelligence / Deals
+  else if (p.includes("price") || p.includes("product") || p.includes("amazon") || p.includes("flipkart") || p.includes("store") || p.includes("affiliate") || p.includes("shop")) {
+    domain = "E-Commerce Intelligence";
+    nodes.push({ id: "n1", type: "trigger", title: "Multi-Store SKU Price Scanner", service: "PriceWatch Real-Time Engine", badge: "Trigger" });
+    nodes.push({ id: "n2", type: "action", title: "Dynamic Product Price Normalizer", service: "Playwright Headless Ingestion", badge: "Scraping" });
+    nodes.push({ id: "n3", type: "ai", title: "Best Deal & Dupe Evaluation Engine", service: "Rule Engine + Claude 3.5 Sonnet", badge: "AI Reasoning" });
+    nodes.push({ id: "n4", type: "action", title: "Affiliate Link & Coupon Injection", service: "WinPlayBox Affiliate Engine", badge: "Monetization" });
+    nodes.push({ id: "n5", type: "output", title: "Instant Deal Push & Telegram Bot", service: "Telegram & Webhook Alerts", badge: "Dispatch" });
+  }
+  // 5. DevOps / Autonomous Coding / GitHub
+  else if (p.includes("github") || p.includes("code") || p.includes("pr") || p.includes("bug") || p.includes("docker") || p.includes("api") || p.includes("backend")) {
+    domain = "DevOps & Engineering";
+    nodes.push({ id: "n1", type: "trigger", title: "GitHub Issue / Task Event", service: "GitHub REST & Webhooks", badge: "Trigger" });
+    nodes.push({ id: "n2", type: "action", title: "Sandbox Test Environment Runner", service: "Docker Ephemeral VM", badge: "Execution" });
+    nodes.push({ id: "n3", type: "ai", title: "Autonomous Code Remediation", service: "Claude 3.5 Sonnet / Antigravity", badge: "Coding AI" });
+    nodes.push({ id: "n4", type: "action", title: "Automated Lint & Test Gate", service: "Jest / Pytest Runner", badge: "Verification" });
+    nodes.push({ id: "n5", type: "output", title: "Automated PR & Code Review Post", service: "GitHub Pull Request API", badge: "Delivery" });
+  }
+  // 6. Scheduled Automation / Cron
+  else if (p.includes("schedule") || p.includes("cron") || p.includes("daily") || p.includes("hour")) {
+    domain = "Scheduled Automation";
+    nodes.push({ id: "n1", type: "trigger", title: "Cron Automated Interval Trigger", service: "Schedule Engine", badge: "Trigger" });
+    nodes.push({ id: "n2", type: "action", title: "Data Harvesting & Normalization", service: "Playwright / API Ingestion", badge: "Data Ingestion" });
+    nodes.push({ id: "n3", type: "ai", title: "Autonomous LLM Reasoning Agent", service: "GPT-4o Multi-Modal", badge: "AI Agent" });
+    nodes.push({ id: "n4", type: "action", title: "Quality Gate & Schema Validation", service: "Zod / JSON Schema Gate", badge: "Logic Gate" });
+    nodes.push({ id: "n5", type: "output", title: "Multi-Destination Dispatch", service: "Slack / Email / Webhook", badge: "Delivery" });
+  }
+  // 7. General Agentic Pipeline
+  else {
+    nodes.push({ id: "n1", type: "trigger", title: "Inbound HTTP Webhook Event", service: "Omni Gateway Trigger", badge: "Trigger" });
+    nodes.push({ id: "n2", type: "action", title: "Payload Parsing & Context Normalizer", service: "Data Transformer", badge: "Extraction" });
+    nodes.push({ id: "n3", type: "ai", title: "Autonomous Reasoning & Synthesis", service: "Claude 3.5 Sonnet", badge: "AI Agent" });
+    nodes.push({ id: "n4", type: "action", title: "Policy & Quality Verification Gate", service: "Confidence Threshold Gate", badge: "Logic Gate" });
+    nodes.push({ id: "n5", type: "output", title: "Multi-Platform Output & Notification", service: "REST Webhook / DB / Notification", badge: "Delivery" });
   }
 
   return {
     id: "custom-" + Date.now(),
-    title: prompt.length > 50 ? prompt.substring(0, 47) + "..." : prompt,
+    title: prompt.length > 55 ? prompt.substring(0, 52).trim() + "..." : prompt.trim(),
     domain: domain,
     stepsCount: nodes.length,
-    description: `Synthesized on-demand from prompt: "${prompt}". Autonomous orchestration with animated laser data telemetry.`,
+    description: `Synthesized on-demand from prompt: "${prompt.slice(0, 200)}". Autonomous orchestration with animated laser data telemetry.`,
     tags: ["Custom AI", "Real-Time", domain],
     nodes: nodes
   };

@@ -321,6 +321,10 @@ button, input, textarea, select {
   font-size: 0.95rem;
   outline: none;
   transition: all 0.2s ease;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 54px;
+  line-height: 1.5;
 }
 
 .prompt-input:focus {

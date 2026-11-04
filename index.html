@@ -96,14 +96,14 @@
         <!-- Prompt Input Bar -->
         <div class="generator-card">
           <form id="prompt-generator-form" class="prompt-form">
-            <input 
-              type="text" 
+            <textarea 
               id="prompt-input" 
               class="prompt-input" 
-              placeholder="e.g. Scrape YouTube audio, transcribe with Whisper, generate 5 viral tweets with Gemini, and post to Buffer..."
+              rows="2"
+              placeholder="e.g. Scrape YouTube audio, transcribe with Whisper, generate 5 viral tweets with Gemini, or paste master prompt from GravityClaw..."
               required
               autocomplete="off"
-            >
+            ></textarea>
             <button type="submit" id="prompt-submit-btn" class="btn-primary">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               <span>Synthesize Pipeline</span>
